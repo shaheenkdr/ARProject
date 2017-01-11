@@ -1,0 +1,73 @@
+{
+  "project_info": {
+    "project_number": "301520123816",
+    "firebase_url": "https://project-ar-312a4.firebaseio.com",
+    "project_id": "project-ar-312a4",
+    "storage_bucket": "project-ar-312a4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:301520123816:android:6f1ee896cebf71e5",
+        "android_client_info": {
+          "package_name": "com.augmentedreality.projectar"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "301520123816-139n3mpd1iamdtfqjbkf56srt4d44bd1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAzc2EhdVtat9H-lwC1T0arpQ13iFxoaSQ"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:301520123816:android:3a104b9291ef87e7",
+        "android_client_info": {
+          "package_name": "com.xaugmentedreality.arproject"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "301520123816-139n3mpd1iamdtfqjbkf56srt4d44bd1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAzc2EhdVtat9H-lwC1T0arpQ13iFxoaSQ"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
