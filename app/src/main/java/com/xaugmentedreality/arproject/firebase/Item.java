@@ -13,49 +13,35 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-    "uid",
-    "title",
-    "desc",
-    "isvideo",
-    "url_image",
-    "url_app"
+        "desc",
+        "isvideo",
+        "isdeleted",
+        "title",
+        "uid",
+        "updated",
+        "url_app",
+        "url_image"
 })
 public class Item {
 
-    @JsonProperty("uid")
-    private String uid;
-    @JsonProperty("title")
-    private String title;
     @JsonProperty("desc")
     private String desc;
     @JsonProperty("isvideo")
     private Boolean isvideo;
-    @JsonProperty("url_image")
-    private String urlImage;
+    @JsonProperty("isdeleted")
+    private Boolean isdeleted;
+    @JsonProperty("title")
+    private String title;
+    @JsonProperty("uid")
+    private String uid;
+    @JsonProperty("updated")
+    private Integer updated;
     @JsonProperty("url_app")
     private String urlApp;
+    @JsonProperty("url_image")
+    private String urlImage;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
-
-    @JsonProperty("uid")
-    public String getUid() {
-        return uid;
-    }
-
-    @JsonProperty("uid")
-    public void setUid(String uid) {
-        this.uid = uid;
-    }
-
-    @JsonProperty("title")
-    public String getTitle() {
-        return title;
-    }
-
-    @JsonProperty("title")
-    public void setTitle(String title) {
-        this.title = title;
-    }
 
     @JsonProperty("desc")
     public String getDesc() {
@@ -77,14 +63,44 @@ public class Item {
         this.isvideo = isvideo;
     }
 
-    @JsonProperty("url_image")
-    public String getUrlImage() {
-        return urlImage;
+    @JsonProperty("isdeleted")
+    public Boolean getIsdeleted() {
+        return isdeleted;
     }
 
-    @JsonProperty("url_image")
-    public void setUrlImage(String urlImage) {
-        this.urlImage = urlImage;
+    @JsonProperty("isdeleted")
+    public void setIsdeleted(Boolean isdeleted) {
+        this.isdeleted = isdeleted;
+    }
+
+    @JsonProperty("title")
+    public String getTitle() {
+        return title;
+    }
+
+    @JsonProperty("title")
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    @JsonProperty("uid")
+    public String getUid() {
+        return uid;
+    }
+
+    @JsonProperty("uid")
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
+
+    @JsonProperty("updated")
+    public Integer getUpdated() {
+        return updated;
+    }
+
+    @JsonProperty("updated")
+    public void setUpdated(Integer updated) {
+        this.updated = updated;
     }
 
     @JsonProperty("url_app")
@@ -95,6 +111,16 @@ public class Item {
     @JsonProperty("url_app")
     public void setUrlApp(String urlApp) {
         this.urlApp = urlApp;
+    }
+
+    @JsonProperty("url_image")
+    public String getUrlImage() {
+        return urlImage;
+    }
+
+    @JsonProperty("url_image")
+    public void setUrlImage(String urlImage) {
+        this.urlImage = urlImage;
     }
 
     @JsonAnyGetter

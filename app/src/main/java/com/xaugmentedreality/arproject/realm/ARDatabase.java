@@ -15,8 +15,10 @@ public class ARDatabase extends RealmObject
     private String namex;
     private String desc;
     private boolean isVideo;
+    private boolean isDeleted;
     private String urlImg;
     private String urlApp;
+    private int updates;
     private boolean isDownloaded;
     private String location;
 
@@ -62,6 +64,16 @@ public class ARDatabase extends RealmObject
         this.isVideo = isVideo;
     }
 
+    public boolean getIsDeleted()
+    {
+        return isDeleted;
+    }
+
+    public void setIsDeleted(boolean isDeleted)
+    {
+        this.isDeleted = isDeleted;
+    }
+
     public String getUrlImg()
     {
         return urlImg;
@@ -80,6 +92,16 @@ public class ARDatabase extends RealmObject
     public void setUrlApp(String urlApp)
     {
         this.urlApp = urlApp;
+    }
+
+    public int getUpdates()
+    {
+        return updates;
+    }
+
+    public void setUpdates(int updates)
+    {
+        this.updates = updates;
     }
 
     public boolean getIsDownloaded()
