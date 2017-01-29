@@ -1,8 +1,10 @@
 package com.xaugmentedreality.arproject.activities;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -59,7 +61,6 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
     private RelativeLayout rl;
     private TextView descText;
     private Button clickButton;
-    private static final String TEST_URL = "http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4";
     private static final String messi = "Know more about messi";
     private static final String bunny = "The ultimate animation movie";
     private static final String wedding = "check our best offers for wedding";
@@ -103,13 +104,13 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
 
         /**Set image and QR matching callbacks */
         aRmatcher.setImageRecognitionCallback(this);
-        aRmatcher.setQRRecognitionCallback(this);
+        //aRmatcher.setQRRecognitionCallback(this);
 
         /**Add camera view instance to content view */
         frame.addView(aRmatcher.getCameraViewInstance());
 
         /**Set the matching type.*/
-        aRmatcher.setMatchingType(ARmatcher.BOTH_IMAGE_AND_QR_MATCHER);
+        aRmatcher.setMatchingType(ARmatcher.IMAGE_MATCHER);
 
         /**Enable median filter ,witch help to reduce noise and mismatches in IMAGE matching .(Optional) */
         aRmatcher.enableMedianFilter(true);
@@ -136,7 +137,6 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
         beginAddImages();
     }
 
-    private void throwCrash(){throw new NullPointerException("damn");}
     private void addView()
     {
         controlInflater = LayoutInflater.from(getBaseContext());
@@ -151,6 +151,7 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
     private void beginAddImages() {
         AddImagesTask ait=new AddImagesTask(this);
         ait.execute((Void)null);
+
     }
 
     protected void onResume() {
@@ -284,7 +285,7 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
         return imagePool_Id;
     }
 
-    private int addImageFromResources(int imageResourceId, String title) {
+    private int addImageFromResources(String uid, String title) {
         /**Add images from local resources to image matching pool
          * Adding image returns image id assigned to the image in the matching pool.
          * We will save it to know which image was matched
@@ -295,7 +296,9 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
          * therefore large images must be reduced/scaled.
          */
 
-        Bitmap bmp = BitmapFactory.decodeResource(getResources(), imageResourceId);
+        File sd = getExternalCacheDir();
+        File f1 = new File(String.valueOf(sd)+"/"+uid+".jpg");
+        Bitmap bmp = BitmapFactory.decodeFile(f1.getAbsolutePath());
         int imagePool_Id;
 
         imagePool_Id = aRmatcher.addImage(bmp);
@@ -303,15 +306,16 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
         if(imagePool_Id != -1){
             imageTitles.put(imagePool_Id,title);
 
-            Log.i(TAG,"image added to the pool with id: " + imagePool_Id);
+            Log.e("TAG","image added to the pool with id: " + imagePool_Id);
         }else{
-            Log.i(TAG,"image not added to the pool");
+            Log.e("TAG","image not added to the pool");
         }
 
         bmp.recycle();
 
         return imagePool_Id;
     }
+
 
     private int addImageDataFromPath(String path,String title)
     {
@@ -322,9 +326,9 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
         if(imagePool_Id != -1){
             imageTitles.put(imagePool_Id,title);
 
-            Log.i(TAG,"image added to the pool with id: " + imagePool_Id);
+            Log.e("TAG","image added to the pool with id: " + imagePool_Id);
         }else{
-            Log.i(TAG,"image not added to the pool");
+            Log.e("TAG","image not added to the pool");
         }
 
         return imagePool_Id;
@@ -540,16 +544,9 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
 
 
 
-            addImageFromResources(R.drawable.join, "join");
-            addImageFromResources(R.drawable.messo, "messi");
-            addImageFromResources(R.drawable.wedding, "wedding");
-            addImageFromResources(R.drawable.bunny, "bunny");
-            addImageFromResources(R.drawable.intro, "intro");
+            addImageFromResources("AR11", "messi");
 
-
-            //addImageFromURL("https://i.ytimg.com/vi/fIkcTXj6oMo/maxresdefault.jpg", "ronaldo");
-            //addLargeImageWithId(R.drawable.underworld,"Underworld",333,1200);
-            //addLargeImageWithId(R.drawable.crx,"rronnnnaa",334,1200);
+            //addImageDataFromPath(String.valueOf(getExternalCacheDir())+"/"+"AR11.jpg","messi");
 
 
 

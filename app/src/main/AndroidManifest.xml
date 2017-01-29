@@ -34,7 +34,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.CameraActivity" android:configChanges="keyboardHidden|screenLayout|screenSize"/>
+        <activity android:name=".activities.CameraActivity" android:configChanges="keyboardHidden|screenLayout|screenSize" android:theme="@style/AppThemeSecondary"/>
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="b4010acca4e45769691279b63de4ddb460606a09" />

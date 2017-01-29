@@ -1,6 +1,9 @@
 package com.xaugmentedreality.arproject.activities;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,6 +20,7 @@ import com.liulishuo.filedownloader.BaseDownloadTask;
 import com.liulishuo.filedownloader.FileDownloadListener;
 import com.liulishuo.filedownloader.FileDownloadQueueSet;
 import com.liulishuo.filedownloader.FileDownloader;
+import com.wang.avi.AVLoadingIndicatorView;
 import com.xaugmentedreality.arproject.R;
 import com.xaugmentedreality.arproject.firebase.DataPojo;
 import com.xaugmentedreality.arproject.firebase.Item;
@@ -38,26 +42,44 @@ public class SplashActivity extends AppCompatActivity {
     private Realm mRealm;
     private DataPojo mData;
     private List<DownLoadList> mdataCollection;
+    private Intent mIntent;
+    private AVLoadingIndicatorView avi;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Fabric.with(this, new Crashlytics(), new CrashlyticsNdk());
         setContentView(R.layout.activity_splash);
         mRealm = Realm.getInstance(this);
+        mIntent = new Intent(SplashActivity.this,CameraActivity.class);
+        mIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         mdataCollection = new ArrayList<>();
-        Button b1 = (Button)findViewById(R.id.b1);
-        b1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent x = new Intent(SplashActivity.this,CameraActivity.class);
-                startActivity(x);
-                finish();
-            }
-        });
-        //updateDatabase("AR11","PEEP PEEP");
-        retrieveData();
-        //listDatabase();
-        //downloadImage();
+        avi= (AVLoadingIndicatorView) findViewById(R.id.avi);
+        avi.show();
+        checkConnectivity(getApplicationContext());
+
+    }
+
+    /**
+     * Method to check whether the device is connected to the Internet
+     * If connected initiate download process, other wise launch
+     * the image recognition engine
+     */
+    private void checkConnectivity(Context context)
+    {
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        if (activeNetwork != null)
+        {
+            Log.e("TAG","HAS INTERNET CONNECTION");
+            retrieveData();
+        }
+        else
+        {
+            Log.e("TAG","NO INTERNET CONNECTION");
+            avi.hide();
+            startActivity(mIntent);
+            finish();
+        }
 
     }
 
@@ -73,6 +95,7 @@ public class SplashActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
+                Log.e("TAG","FIREBASE DATA RETRIEVED");
                 mData = dataSnapshot.getValue(DataPojo.class);
                 insertToDatabase();
 
@@ -80,7 +103,11 @@ public class SplashActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(FirebaseError firebaseError) {
+                Log.e("TAG","FIREBASE RETRIEVAL FAILED");
                 Log.e("data error", firebaseError.getMessage());
+                avi.hide();
+                startActivity(mIntent);
+                finish();
 
             }
         });
@@ -275,77 +302,89 @@ public class SplashActivity extends AppCompatActivity {
      */
     private void invokeDownloadManager()
     {
-        final FileDownloadListener queueTarget = new FileDownloadListener() {
-            @Override
-            protected void pending(BaseDownloadTask task, int soFarBytes, int totalBytes) {
-            }
-
-            @Override
-            protected void connected(BaseDownloadTask task, String etag, boolean isContinue, int soFarBytes, int totalBytes) {
-            }
-
-            @Override
-            protected void progress(BaseDownloadTask task, int soFarBytes, int totalBytes) {
-            }
-
-            @Override
-            protected void blockComplete(BaseDownloadTask task) {
-            }
-
-            @Override
-            protected void retry(final BaseDownloadTask task, final Throwable ex, final int retryingTimes, final int soFarBytes) {
-            }
-
-            @Override
-            protected void completed(BaseDownloadTask task)
-            {
-                try {
-                    downloadUpdateDatabase(task.getFilename().replaceAll(".jpg", ""), String.valueOf(getExternalCacheDir()) + "/");
-                }
-                catch (Exception e){ e.printStackTrace(); Log.e("TAG","UPDATE CRASH");}
-                Log.e("TAG","NAME:"+task.getFilename().replaceAll(".jpg","")+" ID: "+task.getId());
-            }
-
-            @Override
-            protected void paused(BaseDownloadTask task, int soFarBytes, int totalBytes) {
-            }
-
-            @Override
-            protected void error(BaseDownloadTask task, Throwable e) {
-            }
-
-            @Override
-            protected void warn(BaseDownloadTask task) {
-            }
-        };
-
-        File sd = getExternalCacheDir();
-        File folder = new File(sd, "/mobio/");
-        if (!folder.exists()) {
-            if (!folder.mkdir()) {
-                Log.e("ERROR", "Cannot create a directory!");
-            } else {
-                folder.mkdirs();
-            }
-        }
-
-        final FileDownloadQueueSet queueSet = new FileDownloadQueueSet(queueTarget);
-
-        final List<BaseDownloadTask> tasks = new ArrayList<>();
-        for (DownLoadList x:mdataCollection)
+        if(mdataCollection.size()!=0)
         {
-            tasks.add(FileDownloader.getImpl().create(x.getImageUrl()).setPath(String.valueOf(sd)+"/"+x.getUid()+".jpg").setTag(x.getUid()));
-        }
-        queueSet.disableCallbackProgressTimes();
-        queueSet.downloadSequentially(tasks);
-        queueSet.addTaskFinishListener(new BaseDownloadTask.FinishListener() {
-            @Override
-            public void over(BaseDownloadTask task)
-            {
+            final FileDownloadListener queueTarget = new FileDownloadListener() {
+                @Override
+                protected void pending(BaseDownloadTask task, int soFarBytes, int totalBytes) {
+                }
 
+                @Override
+                protected void connected(BaseDownloadTask task, String etag, boolean isContinue, int soFarBytes, int totalBytes) {
+                }
+
+                @Override
+                protected void progress(BaseDownloadTask task, int soFarBytes, int totalBytes) {
+                }
+
+                @Override
+                protected void blockComplete(BaseDownloadTask task) {
+                }
+
+                @Override
+                protected void retry(final BaseDownloadTask task, final Throwable ex, final int retryingTimes, final int soFarBytes) {
+                }
+
+                @Override
+                protected void completed(BaseDownloadTask task)
+                {
+                    try {
+                        downloadUpdateDatabase(task.getFilename().replaceAll(".jpg", ""), String.valueOf(getExternalCacheDir()) + "/");
+                    }
+                    catch (Exception e){ e.printStackTrace(); Log.e("TAG","UPDATE CRASH");}
+                    Log.e("TAG","NAME:"+task.getFilename().replaceAll(".jpg","")+" ID: "+task.getId());
+                }
+
+                @Override
+                protected void paused(BaseDownloadTask task, int soFarBytes, int totalBytes) {
+                }
+
+                @Override
+                protected void error(BaseDownloadTask task, Throwable e) {
+                }
+
+                @Override
+                protected void warn(BaseDownloadTask task) {
+                }
+            };
+
+            File sd = getExternalCacheDir();
+            final FileDownloadQueueSet queueSet = new FileDownloadQueueSet(queueTarget);
+            final int taskCount = mdataCollection.size()-1;
+
+            final List<BaseDownloadTask> tasks = new ArrayList<>();
+            for (DownLoadList x:mdataCollection)
+            {
+                tasks.add(FileDownloader.getImpl().create(x.getImageUrl()).setPath(String.valueOf(sd)+"/"+x.getUid()+".jpg").setTag(x.getUid()));
             }
-        });
-        queueSet.start();
+            queueSet.disableCallbackProgressTimes();
+            queueSet.downloadSequentially(tasks);
+            queueSet.addTaskFinishListener(new BaseDownloadTask.FinishListener() {
+                int finishedTaskCount = 0;
+                @Override
+                public void over(BaseDownloadTask task)
+                {
+                    Log.e("TAGX","taskCount:"+taskCount+"finishedtaskcount:"+finishedTaskCount);
+                    if (finishedTaskCount < taskCount)
+                    {
+                        ++finishedTaskCount;
+                    }
+                    else
+                    {
+                        avi.hide();
+                        startActivity(mIntent);
+                        finish();
+                    }
+                }
+            });
+            queueSet.start();
+        }
+        else
+        {
+            avi.hide();
+            startActivity(mIntent);
+        }
+
     }
 
 
