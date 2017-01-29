@@ -3,6 +3,8 @@ package com.xaugmentedreality.arproject.activities;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -34,7 +36,13 @@ import com.arlab.callbacks.ARmatcherImageCallBack;
 import com.arlab.callbacks.ARmatcherQRCallBack;
 import com.arlab.imagerecognition.ARmatcher;
 import com.arlab.imagerecognition.ROI;
+import com.liulishuo.filedownloader.FileDownloader;
 import com.xaugmentedreality.arproject.R;
+import com.xaugmentedreality.arproject.realm.ARDatabase;
+import com.xaugmentedreality.arproject.utility.DownLoadList;
+
+import io.realm.Realm;
+import io.realm.RealmResults;
 //
 
 public class CameraActivity extends AppCompatActivity implements ARmatcherImageCallBack, ARmatcherQRCallBack {
@@ -49,6 +57,8 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
     /**Debug Tag */
     private static final String TAG = "ARLAB_Hello";
 
+    private List<DownLoadList> mdataCollection;
+    private Realm mRealm;
     TextView textView = null;
     private int screenheight;
     private int screenwidth;
@@ -61,6 +71,7 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
     private RelativeLayout rl;
     private TextView descText;
     private Button clickButton;
+    private ProgressDialog progressDialog;
     private static final String messi = "Know more about messi";
     private static final String bunny = "The ultimate animation movie";
     private static final String wedding = "check our best offers for wedding";
@@ -93,8 +104,9 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
         crop=(RelativeLayout)findViewById(R.id.crop);
 
 
-        // Sets the callback to this Activity, since it inherits EasyVideoCallback
-
+        mRealm = Realm.getInstance(this);
+        mdataCollection = new ArrayList<>();
+        generateImageQueue();
 
         /**Create an instance of the ARmatcher object. */
         aRmatcher = new ARmatcher(this,API_KEY_MATCHER,ARmatcher.SCREEN_ORIENTATION_PORTRAIT,screenwidth,screenheight,true);
@@ -154,8 +166,16 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
 
     }
 
+    protected void onPause() {
+        super.onPause();
+        /**Stop matching*/
+        aRmatcher.stop();
+
+    }
+
     protected void onResume() {
         super.onResume();
+        progressDialog=ProgressDialog.show(CameraActivity.this, "Loading", "Setting up the engine");
         aRmatcher.start();
         beginAddImages();
     }
@@ -170,13 +190,33 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
         System.gc();
     }
 
-    protected void onPause() {
-        super.onPause();
-        /**Stop matching*/
-        aRmatcher.stop();
-
+    protected void onDestroy()
+    {
+        super.onDestroy();
+        if (progressDialog != null) {
+            progressDialog.dismiss();
+            progressDialog = null;
+        }
     }
 
+
+    /**
+     * method to fetch the objects from realm and add to the data
+     * collection to be added to the Image loader of the
+     * Augmented reality engine
+     */
+    private void generateImageQueue()
+    {
+        RealmResults<ARDatabase> results = mRealm.where(ARDatabase.class).findAll();
+
+        for(ARDatabase x:results)
+        {
+            if(x.getIsDownloaded())
+            {
+                mdataCollection.add(new DownLoadList(x.getUrlImg(),x.getUid(),x.getNamex()));
+            }
+        }
+    }
 
     protected void setCroppingArea() {
         /**Select cropping area to be analyzed */
@@ -519,7 +559,7 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
      */
     private class AddImagesTask extends AsyncTask<Void, Void, Boolean>{
         private Context context;
-        private ProgressDialog progressDialog;
+
         public AddImagesTask(Context context) {
             this.context=context;
         }
@@ -529,7 +569,6 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            progressDialog=ProgressDialog.show(context, "Loading", "Adding Images to Library");
         }
 
         /**
@@ -541,13 +580,11 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
             //Adding Images
 
             /** Add image from local resources **/
+            for (DownLoadList x:mdataCollection)
+            {
+                addImageFromResources(x.getUid(), x.getTitle());
 
-
-
-            addImageFromResources("AR11", "messi");
-
-            //addImageDataFromPath(String.valueOf(getExternalCacheDir())+"/"+"AR11.jpg","messi");
-
+            }
 
 
             return true;

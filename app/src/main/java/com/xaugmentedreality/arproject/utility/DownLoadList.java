@@ -9,11 +9,13 @@ public class DownLoadList
 {
     private final String IMAGE_URL;
     private final String UID;
+    private final String TITLE;
 
-    public DownLoadList(String IMAGE_URL,String UID)
+    public DownLoadList(String IMAGE_URL,String UID,String TITLE)
     {
         this.IMAGE_URL = IMAGE_URL;
         this.UID = UID;
+        this.TITLE = TITLE;
     }
 
     public String getImageUrl()
@@ -24,5 +26,10 @@ public class DownLoadList
     public String getUid()
     {
         return UID;
+    }
+
+    public String getTitle()
+    {
+        return TITLE;
     }
 }

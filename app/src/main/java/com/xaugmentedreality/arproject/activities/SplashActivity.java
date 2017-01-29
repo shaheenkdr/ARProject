@@ -230,7 +230,7 @@ public class SplashActivity extends AppCompatActivity {
         {
             if(!x.getIsDownloaded())
             {
-                mdataCollection.add(new DownLoadList(x.getUrlImg(),x.getUid()));
+                mdataCollection.add(new DownLoadList(x.getUrlImg(),x.getUid(),x.getNamex()));
             }
         }
         invokeDownloadManager();
