@@ -4,11 +4,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
 
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.ndk.CrashlyticsNdk;
@@ -20,7 +19,6 @@ import com.liulishuo.filedownloader.BaseDownloadTask;
 import com.liulishuo.filedownloader.FileDownloadListener;
 import com.liulishuo.filedownloader.FileDownloadQueueSet;
 import com.liulishuo.filedownloader.FileDownloader;
-import com.wang.avi.AVLoadingIndicatorView;
 import com.xaugmentedreality.arproject.R;
 import com.xaugmentedreality.arproject.firebase.DataPojo;
 import com.xaugmentedreality.arproject.firebase.Item;
@@ -33,7 +31,6 @@ import java.util.List;
 
 import io.fabric.sdk.android.Fabric;
 import io.realm.Realm;
-import io.realm.RealmQuery;
 import io.realm.RealmResults;
 import io.realm.exceptions.RealmException;
 
@@ -43,9 +40,9 @@ public class SplashActivity extends AppCompatActivity {
     private DataPojo mData;
     private List<DownLoadList> mdataCollection;
     private Intent mIntent;
-    private AVLoadingIndicatorView avi;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTheme(R.style.AppTheme);
         super.onCreate(savedInstanceState);
         Fabric.with(this, new Crashlytics(), new CrashlyticsNdk());
         setContentView(R.layout.activity_splash);
@@ -53,10 +50,8 @@ public class SplashActivity extends AppCompatActivity {
         mIntent = new Intent(SplashActivity.this,CameraActivity.class);
         mIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         mdataCollection = new ArrayList<>();
-        avi= (AVLoadingIndicatorView) findViewById(R.id.avi);
-        avi.show();
-        checkConnectivity(getApplicationContext());
 
+        checkConnectivity(getApplicationContext());
     }
 
     /**
@@ -76,7 +71,6 @@ public class SplashActivity extends AppCompatActivity {
         else
         {
             Log.e("TAG","NO INTERNET CONNECTION");
-            avi.hide();
             startActivity(mIntent);
             finish();
         }
@@ -105,7 +99,6 @@ public class SplashActivity extends AppCompatActivity {
             public void onCancelled(FirebaseError firebaseError) {
                 Log.e("TAG","FIREBASE RETRIEVAL FAILED");
                 Log.e("data error", firebaseError.getMessage());
-                avi.hide();
                 startActivity(mIntent);
                 finish();
 
@@ -138,7 +131,6 @@ public class SplashActivity extends AppCompatActivity {
                             db.setIsDeleted(itemx.getIsdeleted());
                             db.setUrlImg(itemx.getUrlImage());
                             db.setUrlApp(itemx.getUrlApp());
-
                             db.setUpdates(itemx.getUpdated());
                             Log.e("THIN",""+db.getUpdates());
                             db.setIsDownloaded(false);
@@ -240,6 +232,7 @@ public class SplashActivity extends AppCompatActivity {
     /**
      * method to log the entire realm database
      */
+    @SuppressWarnings("unused")
     private void listDatabase()
     {
         RealmResults<ARDatabase> result2 = mRealm.where(ARDatabase.class)
@@ -371,7 +364,6 @@ public class SplashActivity extends AppCompatActivity {
                     }
                     else
                     {
-                        avi.hide();
                         startActivity(mIntent);
                         finish();
                     }
@@ -381,7 +373,6 @@ public class SplashActivity extends AppCompatActivity {
         }
         else
         {
-            avi.hide();
             startActivity(mIntent);
         }
 

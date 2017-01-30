@@ -7,14 +7,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".activities.SplashActivity">
 
- <com.wang.avi.AVLoadingIndicatorView
-     android:id="@+id/avi"
-     android:layout_centerHorizontal="true"
-     android:layout_marginTop="30dp"
-     android:layout_width="wrap_content"
-     android:layout_height="wrap_content"
-     app:indicatorName="BallClipRotateMultipleIndicator"
-     />
 
  <Button
      android:layout_centerInParent="true"
