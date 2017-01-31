@@ -57,6 +57,7 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
     /**Debug Tag */
     private static final String TAG = "ARLAB_Hello";
 
+
     private List<DownLoadList> mdataCollection;
     private Realm mRealm;
     TextView textView = null;

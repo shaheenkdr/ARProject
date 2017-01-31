@@ -47,7 +47,7 @@ public class SplashActivity extends AppCompatActivity {
         Fabric.with(this, new Crashlytics(), new CrashlyticsNdk());
         setContentView(R.layout.activity_splash);
         mRealm = Realm.getInstance(this);
-        mIntent = new Intent(SplashActivity.this,CameraActivity.class);
+        mIntent = new Intent(SplashActivity.this,AppIntro.class);
         mIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         mdataCollection = new ArrayList<>();
 
