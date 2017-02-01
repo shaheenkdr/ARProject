@@ -3,22 +3,27 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".activities.SplashActivity">
 
+ <fr.castorflex.android.smoothprogressbar.SmoothProgressBar
+     android:id="@+id/progress"
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:indeterminate="true"
+     style="@style/GNowProgressBar"/>
 
- <Button
-     android:layout_centerInParent="true"
-     android:id="@+id/b1"
-     android:text="Click me"
-     android:visibility="invisible"
-     android:layout_width="100dp"
-     android:layout_height="50dp" />
-
+ <FrameLayout
+     android:layout_below="@+id/progress"
+     android:layout_width="match_parent"
+     android:layout_height="match_parent">
  <ImageView
      android:src="@drawable/back"
      android:scaleType="centerCrop"
      android:layout_width="match_parent"
      android:layout_height="match_parent" />
+ </FrameLayout>
+
+
+
 
 </RelativeLayout>

@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/ARProject.iml" filepath="$PROJECT_DIR$/ARProject.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/library/library.iml" filepath="$PROJECT_DIR$/library/library.iml" />
+      <module fileurl="file://$PROJECT_DIR$/librarypro/librarypro.iml" filepath="$PROJECT_DIR$/librarypro/librarypro.iml" />
     </modules>
   </component>
 </project>

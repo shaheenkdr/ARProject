@@ -28,10 +28,10 @@ public class AppIntro extends AppIntro2
 
         showSkipButton(false);
         showStatusBar(false);
-        addSlide(AppIntroFragment.newInstance("Hi", "Welcome to CamTube. Follow the instructions to understand the usage", R.drawable.bunny, Color.parseColor("#FFB300")));
-        addSlide(AppIntroFragment.newInstance("Focus", "Place the CamTube camera under an AR enabled Ad and wait for the app to detect", R.drawable.bunny, Color.parseColor("#4CAF50")));
-        addSlide(AppIntroFragment.newInstance("Detect", "An AR enabled overlay is displayed when an image is detected. Clicking on it provides more details.", R.drawable.bunny, Color.parseColor("#FF0031")));
-        addSlide(AppIntroFragment.newInstance("Done!", "You are all done and good to go!", R.drawable.bunny, Color.parseColor("#1976D2")));
+        addSlide(AppIntroFragment.newInstance("Hi", "Welcome to CamTube. Follow the instructions to understand the usage", R.drawable.onboardi, Color.parseColor("#FFB300")));
+        addSlide(AppIntroFragment.newInstance("Focus", "Place the CamTube camera under an AR enabled Ad and wait for the app to detect", R.drawable.scanx, Color.parseColor("#4CAF50")));
+        addSlide(AppIntroFragment.newInstance("Detect", "An AR enabled overlay is displayed when an image is detected. Clicking on it provides more details.", R.drawable.star, Color.parseColor("#F44336")));
+        addSlide(AppIntroFragment.newInstance("Done!", "You are all done and good to go!", R.drawable.medalx, Color.parseColor("#1976D2")));
 
     }
 

@@ -68,7 +68,8 @@ dependencies {
     compile 'io.realm:realm-android:0.84.1'
     compile 'com.android.support:design:25.1.0'
     compile project(':library')
-    compile files('libs/YouTubeAndroidPlayerApi.jar')
+    compile project(':librarypro')
+
 
 
     compile('com.crashlytics.sdk.android:crashlytics:2.6.5@aar') {
