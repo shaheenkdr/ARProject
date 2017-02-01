@@ -2,6 +2,7 @@ package com.xaugmentedreality.arproject.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Handler;
@@ -40,15 +41,40 @@ public class SplashActivity extends AppCompatActivity {
     private DataPojo mData;
     private List<DownLoadList> mdataCollection;
     private Intent mIntent;
+    private Intent mIntentIntro;
+    private SharedPreferences pref;
+    private boolean isFirstTime;
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(R.style.AppThemeSecondary);
         super.onCreate(savedInstanceState);
+
         Fabric.with(this, new Crashlytics(), new CrashlyticsNdk());
+
         setContentView(R.layout.activity_splash);
+
         mRealm = Realm.getInstance(this);
-        mIntent = new Intent(SplashActivity.this,AppIntro.class);
+
+        final String TEST ="";
+        pref = getSharedPreferences("OnBoardCheck", Context.MODE_PRIVATE);
+        String check = pref.getString("HASH","");
+        if(check.equals(TEST))
+        {
+            isFirstTime = true;
+        }
+        else
+        {
+            isFirstTime = false;
+        }
+
+        mIntent = new Intent(SplashActivity.this,CameraActivity.class);
+        mIntentIntro = new Intent(SplashActivity.this,AppIntro.class);
         mIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        mIntentIntro.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
         mdataCollection = new ArrayList<>();
 
         checkConnectivity(getApplicationContext());
@@ -71,8 +97,18 @@ public class SplashActivity extends AppCompatActivity {
         else
         {
             Log.e("TAG","NO INTERNET CONNECTION");
-            startActivity(mIntent);
-            finish();
+            if(isFirstTime)
+            {
+                startActivity(mIntentIntro);
+                finish();
+            }
+            else
+            {
+                startActivity(mIntent);
+                finish();
+            }
+
+
         }
 
     }
@@ -99,8 +135,16 @@ public class SplashActivity extends AppCompatActivity {
             public void onCancelled(FirebaseError firebaseError) {
                 Log.e("TAG","FIREBASE RETRIEVAL FAILED");
                 Log.e("data error", firebaseError.getMessage());
-                startActivity(mIntent);
-                finish();
+                if(isFirstTime)
+                {
+                    startActivity(mIntentIntro);
+                    finish();
+                }
+                else
+                {
+                    startActivity(mIntent);
+                    finish();
+                }
 
             }
         });
@@ -364,8 +408,16 @@ public class SplashActivity extends AppCompatActivity {
                     }
                     else
                     {
-                        startActivity(mIntent);
-                        finish();
+                        if(isFirstTime)
+                        {
+                            startActivity(mIntentIntro);
+                            finish();
+                        }
+                        else
+                        {
+                            startActivity(mIntent);
+                            finish();
+                        }
                     }
                 }
             });
@@ -373,7 +425,16 @@ public class SplashActivity extends AppCompatActivity {
         }
         else
         {
-            startActivity(mIntent);
+            if(isFirstTime)
+            {
+                startActivity(mIntentIntro);
+                finish();
+            }
+            else
+            {
+                startActivity(mIntent);
+                finish();
+            }
         }
 
     }

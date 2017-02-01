@@ -1,6 +1,9 @@
 package com.xaugmentedreality.arproject.activities;
 
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.ColorInt;
@@ -39,9 +42,16 @@ public class AppIntro extends AppIntro2
     }
 
     @Override
-    public void onDonePressed(Fragment currentFragment) {
+    public void onDonePressed(Fragment currentFragment)
+    {
         super.onDonePressed(currentFragment);
-        finish();
+        SharedPreferences pref = getSharedPreferences("OnBoardCheck", Context.MODE_PRIVATE);
+        SharedPreferences.Editor ed = pref.edit();
+        ed.putString("HASH", "123456789");
+        ed.apply();
+        Intent mIntent = new Intent(AppIntro.this,CameraActivity.class);
+        mIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(mIntent);
     }
 
 
