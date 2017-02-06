@@ -36,10 +36,13 @@ import com.arlab.callbacks.ARmatcherImageCallBack;
 import com.arlab.callbacks.ARmatcherQRCallBack;
 import com.arlab.imagerecognition.ARmatcher;
 import com.arlab.imagerecognition.ROI;
+import com.google.android.youtube.player.YouTubeStandalonePlayer;
 import com.liulishuo.filedownloader.FileDownloader;
 import com.xaugmentedreality.arproject.R;
 import com.xaugmentedreality.arproject.realm.ARDatabase;
+import com.xaugmentedreality.arproject.utility.DeveloperKey;
 import com.xaugmentedreality.arproject.utility.DownLoadList;
+import com.xaugmentedreality.arproject.utility.ImageQueueObject;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -53,12 +56,11 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
     private ARmatcher aRmatcher;
 
     /**HashMap that holds added images IDs and its titles in the matching pool */
-    private HashMap<Integer, String> imageTitles=new HashMap<Integer,String>();
-    /**Debug Tag */
-    private static final String TAG = "ARLAB_Hello";
+    private HashMap<Integer, ImageQueueObject> imageQueue;
 
 
-    private List<DownLoadList> mdataCollection;
+
+    private List<ImageQueueObject> mdataList;
     private Realm mRealm;
     TextView textView = null;
     private int screenheight;
@@ -73,18 +75,6 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
     private TextView descText;
     private Button clickButton;
     private ProgressDialog progressDialog;
-    private static final String messi = "Know more about messi";
-    private static final String bunny = "The ultimate animation movie";
-    private static final String wedding = "check our best offers for wedding";
-    private static final String join = "Join us for an exciting career";
-
-    private static final String MESSI_URL = "http://www.leomessi.com/";
-    private static final String WED_URL = "https://www.wedding.com/";
-    private static final String JOIN_URL = "https://careers.google.com/";
-
-
-
-
 
 
     @Override
@@ -100,13 +90,14 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
 
         /** Set activity view*/
         setContentView(R.layout.activity_camera);
+        imageQueue=new HashMap<>();
         frame=(FrameLayout)findViewById(R.id.frame);
         grid=(RelativeLayout)findViewById(R.id.grid);
         crop=(RelativeLayout)findViewById(R.id.crop);
 
 
         mRealm = Realm.getInstance(this);
-        mdataCollection = new ArrayList<>();
+        mdataList = new ArrayList<>();
         generateImageQueue();
 
         /**Create an instance of the ARmatcher object. */
@@ -142,11 +133,6 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
         /**Add TextView to the view in order to show matching results. */
         addResultTextView();
 
-        /**Set cropping. */
-        //setCroppingArea();
-        //setROIs();
-
-        //throwCrash();
         beginAddImages();
     }
 
@@ -154,15 +140,12 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
     {
         controlInflater = LayoutInflater.from(getBaseContext());
         View viewControl = controlInflater.inflate(R.layout.overlay, null);
-        ///View viewControl2 = controlInflater.inflate(R.layout.vid_dialog, null);
         LayoutParams layoutParamsControl = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
         this.addContentView(viewControl, layoutParamsControl);
-        //this.addContentView(viewControl2, layoutParamsControl);
-
     }
 
     private void beginAddImages() {
-        AddImagesTask ait=new AddImagesTask(this);
+        AddImagesTask ait=new AddImagesTask();
         ait.execute((Void)null);
 
     }
@@ -214,119 +197,24 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
         {
             if(x.getIsDownloaded())
             {
-                mdataCollection.add(new DownLoadList(x.getUrlImg(),x.getUid(),x.getNamex()));
+                ImageQueueObject q1 = new ImageQueueObject();
+                q1.setUid(x.getUid());
+                q1.setNamex(x.getNamex());
+                q1.setDesc(x.getDesc());
+                q1.setIsVideo(x.getIsVideo());
+                q1.setIsDeleted(x.getIsDeleted());
+                q1.setUrlImg(x.getUrlImg());
+                q1.setUrlApp(x.getUrlApp());
+                q1.setUpdates(x.getUpdates());
+                q1.setIsDownloaded(x.getIsDownloaded());
+                q1.setLocation(x.getLocation());
+                mdataList.add(q1);
             }
         }
     }
 
-    protected void setCroppingArea() {
-        /**Select cropping area to be analyzed */
-        /**
-         * Take in consideration that the cropping area is defined on landscape and portrait modes differently,
-         * In Portrait Mode the (0,0) point will be the upper left corner holding the device portrait ,
-         *  In Landscape Mode the (0,0) point will be the upper left corner holding the device landscape left (upper right in portrait)
-         *
-         */
 
-        /**Set cropping area in TABLET or DEVICES where Camera Preview is NOT set to full screen */
-        /**
-         * Here we use camerawidth and cameraweight because of the camera preview that is not
-         * in a full screen of the device, so we need to know
-         * the exact size to not exceed the camera view borders.
-         *
-         * the screenwidth and screenheight used for drawing the red rectangel marker
-         *
-         */
-    	/*aRmatcher.setImageCropRect(camerawidth/2, 0, camerawidth, cameraheight/2);
-
-    	RelativeLayout.LayoutParams p=new RelativeLayout.LayoutParams(screenwidth/2, screenheight/2);
-        p.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-        p.addRule(RelativeLayout.ALIGN_PARENT_TOP);*/
-
-
-
-        /**Set cropping area in PHONES or Devices with camera preview set to full screen */
-        /**
-         * Here we use screenwidth and screenwidth for both cropping and drawing the marker rectangle
-         * becasue of the full video preview
-         *
-         *
-         */
-        aRmatcher.setImageCropRect(screenwidth/2, 0, screenwidth, screenheight/2);
-
-        RelativeLayout.LayoutParams p=new RelativeLayout.LayoutParams(screenwidth/2, screenheight/2);
-        p.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-        p.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-
-
-
-        crop.setLayoutParams(p);
-        crop.setVisibility(View.VISIBLE);
-    }
-
-    protected void setROIs() {
-        /**Add 4 ROIs */
-        /**
-         * We define 4 regions of interest on the mobile screen to match simultaneous QR codes.
-         */
-        /**
-         * Take in consideration that the cropping area is defined on landscape and portrait modes differently,
-         * In Portrait Mode the (0,0) point will be the upper left corner holding the device portrait ,
-         *  In Landscape Mode the (0,0) point will be the upper left corner holding the device landscape left (upper right in portrait)
-         *
-         */
-        //ROI1
-        ROI r = new ROI(0, 0, screenwidth/2, screenheight/2);
-        aRmatcher.addRoi(r);
-        //ROI2
-        r = new ROI(0,screenheight/2, screenwidth/2, screenheight/2);
-        aRmatcher.addRoi(r);
-        //ROI3
-        r = new ROI(screenwidth/2,0,screenwidth/2, screenheight/2);
-        aRmatcher.addRoi(r);
-        //ROI4
-        r = new ROI(screenwidth/2, screenheight/2,screenwidth/2, screenheight/2);
-        aRmatcher.addRoi(r);
-        grid.setVisibility(View.VISIBLE);
-    }
-
-    private int addLargeImageWithId(int resource, String title, int id, int maxSize) {
-
-        /**Add LARGE (High resolution) image with unique ID*/
-
-        /**
-         * The API provides a helper function to reduce the image size, to avoid memory allocation errors.
-         */
-        Bitmap b = aRmatcher.decodeScaledImageFromResource(resource, maxSize);
-
-        if(aRmatcher.addImage(b,id)){
-            imageTitles.put(id,title);
-            b.recycle();
-
-            Log.i(TAG,"image added to the pool with id: " + id);
-        }else{
-            Log.i(TAG,"image not added to the pool");
-        }
-
-        return id;
-    }
-
-    private int addImageFromURL(String url, String title) {
-        /**Add image from URL */
-        /**It is possible to load remote images to the image pool by setting a valid URL */
-
-        int imagePool_Id = aRmatcher.addImage(url);
-        if(imagePool_Id != -1){
-            imageTitles.put(imagePool_Id,title);
-            Log.i(TAG,"image added to the pool with id: " + imagePool_Id);
-        }else{
-            Log.i(TAG,"image not added to the pool");
-        }
-
-        return imagePool_Id;
-    }
-
-    private int addImageFromResources(String uid, String title) {
+    private int addImageFromResources(ImageQueueObject db) {
         /**Add images from local resources to image matching pool
          * Adding image returns image id assigned to the image in the matching pool.
          * We will save it to know which image was matched
@@ -338,14 +226,14 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
          */
 
         File sd = getExternalCacheDir();
-        File f1 = new File(String.valueOf(sd)+"/"+uid+".jpg");
+        File f1 = new File(String.valueOf(sd)+"/"+db.getUid()+".jpg");
         Bitmap bmp = BitmapFactory.decodeFile(f1.getAbsolutePath());
         int imagePool_Id;
 
         imagePool_Id = aRmatcher.addImage(bmp);
 
         if(imagePool_Id != -1){
-            imageTitles.put(imagePool_Id,title);
+            imageQueue.put(imagePool_Id,db);
 
             Log.e("TAG","image added to the pool with id: " + imagePool_Id);
         }else{
@@ -358,38 +246,7 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
     }
 
 
-    private int addImageDataFromPath(String path,String title)
-    {
-        int imagePool_Id ;
 
-        imagePool_Id = aRmatcher.addImageFromData(path);
-
-        if(imagePool_Id != -1){
-            imageTitles.put(imagePool_Id,title);
-
-            Log.e("TAG","image added to the pool with id: " + imagePool_Id);
-        }else{
-            Log.e("TAG","image not added to the pool");
-        }
-
-        return imagePool_Id;
-    }
-
-    @SuppressWarnings("unused")
-    private int addImageDataFromUrl(String url,String title)
-    {
-        int imagePool_Id ;
-
-        imagePool_Id = aRmatcher.addImageFromDataThroughUrl(url);
-
-        if(imagePool_Id != -1){
-            imageTitles.put(imagePool_Id,title);
-            Log.i(TAG,"image added to the pool with id: " + imagePool_Id);
-        }else{
-            Log.i(TAG,"image not added to the pool");
-        }
-        return imagePool_Id;
-    }
 
     /**Add TextView to the screen to show the matching results. */
     private void addResultTextView()
@@ -405,102 +262,39 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
 
     /**Callback that will accept all IMAGE matching results */
     @Override
-    public void onImageRecognitionResult(int result) {
+    public void onImageRecognitionResult(int result)
+    {
+        Log.e("TAG","IMAGE DETECTED::RESULT: "+result);
+
 
         if (result != -1)
         {
-
-            //card.setVisibility(View.VISIBLE);
-            //title.setText(imageTitles.get(result));
-            textView.setText(imageTitles.get(result));
-
-            if(imageTitles.get(result).equals("bunny"))
+            Log.e("TAG","NOT NULL:: UID: "+imageQueue.get(result));
+            final ImageQueueObject db = imageQueue.get(result);
+            title.setText(db.getNamex());
+            descText.setText(db.getDesc());
+            clickButton.setText(db.getIsVideo()?"video":"Web");
+            card.setCardBackgroundColor(db.getIsVideo()?getResources().getColor(R.color.colorAccent):getResources().getColor(R.color.colorPrimary));
+            card.setVisibility(View.VISIBLE);
+            clickButton.setOnClickListener(new View.OnClickListener()
             {
-                card.setCardBackgroundColor(getResources().getColor(R.color.colorAccent));
-                clickButton.setText("video");
-                title.setText(imageTitles.get(result));
-                descText.setText(bunny);
-                card.setVisibility(View.VISIBLE);
-                clickButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view)
+                @Override
+                public void onClick(View view)
+                {
+                    if(db.getIsVideo())
                     {
-                        aRmatcher.stop();
-                        //GiraffePlayerActivity.configPlayer(HelloMatcherlibActivity.this).setFullScreenOnly(true).play(TEST_URL);
-
+                        Intent intent = YouTubeStandalonePlayer.createVideoIntent(CameraActivity.this, DeveloperKey.DEVELOPER_KEY, db.getUrlApp());
+                        Bundle extras = new Bundle();
+                        extras.putString("YOUTUBE_VIDEO", db.getUrlApp());
+                        intent.putExtras(extras);
+                        startActivity(intent);
                     }
-                });
-
-            }
-            else
-            {
-                clickButton.setText("URL");
-                title.setText(imageTitles.get(result));
-                card.setCardBackgroundColor(getResources().getColor(R.color.colorPrimary));
-
-                if(imageTitles.get(result).equals("wedding"))
-                {
-                    descText.setText(wedding);
-                    card.setVisibility(View.VISIBLE);
-                    clickButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view)
-                        {
-                            aRmatcher.stop();
-                            launchUrl(WED_URL);
-                        }
-                    });
-
+                    else
+                    {
+                        launchUrl(db.getUrlApp());
+                    }
                 }
-
-                if(imageTitles.get(result).equals("intro"))
-                {
-                    descText.setText("Algorithms");
-                    card.setVisibility(View.VISIBLE);
-                    clickButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view)
-                        {
-                            aRmatcher.stop();
-                            launchUrl(WED_URL);
-                        }
-                    });
-
-                }
-
-                if(imageTitles.get(result).equals("messi"))
-                {
-                    descText.setText(messi);
-                    card.setVisibility(View.VISIBLE);
-                    clickButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view)
-                        {
-                            aRmatcher.stop();
-                            launchUrl(MESSI_URL);
-                        }
-                    });
-
-
-                }
-
-                if(imageTitles.get(result).equals("join"))
-                {
-                    descText.setText(join);
-                    card.setVisibility(View.VISIBLE);
-                    clickButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view)
-                        {
-                            aRmatcher.stop();
-                            launchUrl(JOIN_URL);
-                        }
-                    });
-
-                }
-
-
-            }
+            });
 
 
         }
@@ -558,36 +352,18 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
      * @author ARLab
      *
      */
-    private class AddImagesTask extends AsyncTask<Void, Void, Boolean>{
-        private Context context;
+    private class AddImagesTask extends AsyncTask<Void, Void, Boolean>
+    {
 
-        public AddImagesTask(Context context) {
-            this.context=context;
-        }
-        /**
-         * Create and show the progress view
-         */
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        /**
-         * Add the images to the lib.
-         * Wait until the activity has been resumed.
-         */
         @Override
         protected Boolean doInBackground(Void... params) {
             //Adding Images
-
             /** Add image from local resources **/
-            for (DownLoadList x:mdataCollection)
+            for (ImageQueueObject x:mdataList)
             {
-                addImageFromResources(x.getUid(), x.getTitle());
+                addImageFromResources(x);
 
             }
-
-
             return true;
         }
 

@@ -6,9 +6,11 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Handler;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.ndk.CrashlyticsNdk;
@@ -30,6 +32,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
 import io.fabric.sdk.android.Fabric;
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -44,6 +47,7 @@ public class SplashActivity extends AppCompatActivity {
     private Intent mIntentIntro;
     private SharedPreferences pref;
     private boolean isFirstTime;
+    private SmoothProgressBar sm;
 
 
 
@@ -75,8 +79,11 @@ public class SplashActivity extends AppCompatActivity {
         mIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         mIntentIntro.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
+        sm = (SmoothProgressBar)findViewById(R.id.progress);
+        sm.setBackgroundColor(getResources().getColor(R.color.black));
         mdataCollection = new ArrayList<>();
 
+        listDatabase();
         checkConnectivity(getApplicationContext());
     }
 
@@ -125,6 +132,7 @@ public class SplashActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
+                sm.setVisibility(View.VISIBLE);
                 Log.e("TAG","FIREBASE DATA RETRIEVED");
                 mData = dataSnapshot.getValue(DataPojo.class);
                 insertToDatabase();
@@ -157,6 +165,10 @@ public class SplashActivity extends AppCompatActivity {
     private void insertToDatabase()
     {
         final List<Item> items = mData.getItems();
+        if(items.size()>=10)
+        {
+            Snackbar.make(this.findViewById(android.R.id.content), "Please wait while the app synchronizes", Snackbar.LENGTH_SHORT).show();
+        }
         for(Item x:items)
         {
             final Item itemx = x;
@@ -264,8 +276,10 @@ public class SplashActivity extends AppCompatActivity {
 
         for(ARDatabase x:results)
         {
+
             if(!x.getIsDownloaded())
             {
+                Log.e("TAG","D List:"+x.getNamex());
                 mdataCollection.add(new DownLoadList(x.getUrlImg(),x.getUid(),x.getNamex()));
             }
         }
@@ -284,7 +298,7 @@ public class SplashActivity extends AppCompatActivity {
 
         for(ARDatabase x:result2)
         {
-            Log.e("TAG",""+x.getLocation());
+            Log.e("TAG","NAME:"+x.getNamex()+"DOWNLOADED"+x.getIsDownloaded());
         }
     }
 
@@ -387,7 +401,7 @@ public class SplashActivity extends AppCompatActivity {
 
             File sd = getExternalCacheDir();
             final FileDownloadQueueSet queueSet = new FileDownloadQueueSet(queueTarget);
-            final int taskCount = mdataCollection.size()-1;
+            final int taskCount = mdataCollection.size();
 
             final List<BaseDownloadTask> tasks = new ArrayList<>();
             for (DownLoadList x:mdataCollection)
@@ -402,11 +416,8 @@ public class SplashActivity extends AppCompatActivity {
                 public void over(BaseDownloadTask task)
                 {
                     Log.e("TAGX","taskCount:"+taskCount+"finishedtaskcount:"+finishedTaskCount);
-                    if (finishedTaskCount < taskCount)
-                    {
-                        ++finishedTaskCount;
-                    }
-                    else
+                    ++finishedTaskCount;
+                    if(finishedTaskCount==taskCount)
                     {
                         if(isFirstTime)
                         {
