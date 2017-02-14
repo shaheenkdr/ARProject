@@ -162,6 +162,7 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
         progressDialog=ProgressDialog.show(CameraActivity.this, "Loading", "Setting up the engine");
         aRmatcher.start();
         beginAddImages();
+        //test push
     }
 
     protected void onStop() {
