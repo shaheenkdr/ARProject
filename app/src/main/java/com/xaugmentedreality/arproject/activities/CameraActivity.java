@@ -5,10 +5,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
+
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -18,6 +16,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
+import android.support.v4.util.ArrayMap;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
@@ -26,7 +25,6 @@ import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,16 +35,13 @@ import com.arlab.callbacks.ARmatcherQRCallBack;
 import com.arlab.imagerecognition.ARmatcher;
 import com.arlab.imagerecognition.ROI;
 import com.google.android.youtube.player.YouTubeStandalonePlayer;
-import com.liulishuo.filedownloader.FileDownloader;
 import com.xaugmentedreality.arproject.R;
 import com.xaugmentedreality.arproject.realm.ARDatabase;
 import com.xaugmentedreality.arproject.utility.DeveloperKey;
-import com.xaugmentedreality.arproject.utility.DownLoadList;
 import com.xaugmentedreality.arproject.utility.ImageQueueObject;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
-//
 
 public class CameraActivity extends AppCompatActivity implements ARmatcherImageCallBack, ARmatcherQRCallBack {
     private static final String API_KEY_MATCHER = "M3qjM+1zj4q4rDcYC9MOAPtGea/I8isWeQYhcvBCI/Y=";
@@ -56,22 +51,15 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
     private ARmatcher aRmatcher;
 
     /**HashMap that holds added images IDs and its titles in the matching pool */
-    private HashMap<Integer, ImageQueueObject> imageQueue;
+    private ArrayMap<Integer, ImageQueueObject> imageQueue;
 
 
 
     private List<ImageQueueObject> mdataList;
     private Realm mRealm;
     TextView textView = null;
-    private int screenheight;
-    private int screenwidth;
-    private FrameLayout frame;
-    private RelativeLayout grid;
-    private RelativeLayout crop;
-    private LayoutInflater controlInflater = null;
     private TextView title;
     private CardView card;
-    private RelativeLayout rl;
     private TextView descText;
     private Button clickButton;
     private ProgressDialog progressDialog;
@@ -84,18 +72,16 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
         /**Get full screen size */
         DisplayMetrics displaymetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-        screenheight = getWindowManager().getDefaultDisplay().getHeight();
-        screenwidth = getWindowManager().getDefaultDisplay().getWidth();
+        int screenheight = getWindowManager().getDefaultDisplay().getHeight();
+        int screenwidth = getWindowManager().getDefaultDisplay().getWidth();
 
 
         /** Set activity view*/
         setContentView(R.layout.activity_camera);
-        imageQueue=new HashMap<>();
-        frame=(FrameLayout)findViewById(R.id.frame);
-        grid=(RelativeLayout)findViewById(R.id.grid);
-        crop=(RelativeLayout)findViewById(R.id.crop);
+        imageQueue=new ArrayMap<>();
+        FrameLayout frame = (FrameLayout)findViewById(R.id.frame);
 
-
+        /** Initiate Realm db*/
         mRealm = Realm.getInstance(this);
         mdataList = new ArrayList<>();
         generateImageQueue();
@@ -124,9 +110,9 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
 
         addView();
 
+        /** bind overlay xml items to code*/
         title = (TextView)findViewById(R.id.titleText);
         card = (CardView)findViewById(R.id.card);
-        // rl = (RelativeLayout)findViewById(R.id.relative);
         descText = (TextView)findViewById(R.id.descText);
         clickButton = (Button)findViewById(R.id.launchButton);
 
@@ -138,7 +124,7 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
 
     private void addView()
     {
-        controlInflater = LayoutInflater.from(getBaseContext());
+        LayoutInflater controlInflater = LayoutInflater.from(getBaseContext());
         View viewControl = controlInflater.inflate(R.layout.overlay, null);
         LayoutParams layoutParamsControl = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
         this.addContentView(viewControl, layoutParamsControl);
@@ -379,6 +365,23 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
 
             /**Start matching*/
             aRmatcher.start();
+        }
+    }
+
+
+    /**
+     * method to open the email app using intent
+     * to contact the app developer teams
+     * @param view view object
+     */
+    public void emailLauncher(View view)
+    {
+        Intent intent = new Intent(Intent.ACTION_SENDTO);
+        intent.setData(Uri.parse("mailto:")); // only email apps should handle this
+        intent.putExtra(Intent.EXTRA_EMAIL, new String[]{"picgingermail@gmail.com"});
+        intent.putExtra(Intent.EXTRA_SUBJECT, "pic-ginger enquiry");
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
         }
     }
 
