@@ -2,11 +2,11 @@ package com.xaugmentedreality.arproject.activities;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -14,6 +14,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v4.util.ArrayMap;
@@ -25,6 +26,7 @@ import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,6 +36,7 @@ import com.arlab.callbacks.ARmatcherImageCallBack;
 import com.arlab.callbacks.ARmatcherQRCallBack;
 import com.arlab.imagerecognition.ARmatcher;
 import com.arlab.imagerecognition.ROI;
+import com.dynamitechetan.flowinggradient.FlowingGradientClass;
 import com.google.android.youtube.player.YouTubeStandalonePlayer;
 import com.xaugmentedreality.arproject.R;
 import com.xaugmentedreality.arproject.realm.ARDatabase;
@@ -55,7 +58,7 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
 
 
 
-    private List<ImageQueueObject> mdataList;
+    private List<ImageQueueObject> mDataList;
     private Realm mRealm;
     TextView textView = null;
     private TextView title;
@@ -63,8 +66,11 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
     private TextView descText;
     private Button clickButton;
     private ProgressDialog progressDialog;
+    private RelativeLayout rlCard;
+    private final Context mContext = CameraActivity.this;
 
 
+    @SuppressWarnings("deprecation")
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,7 +89,7 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
 
         /** Initiate Realm db*/
         mRealm = Realm.getInstance(this);
-        mdataList = new ArrayList<>();
+        mDataList = new ArrayList<>();
         generateImageQueue();
 
         /**Create an instance of the ARmatcher object. */
@@ -115,6 +121,9 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
         card = (CardView)findViewById(R.id.card);
         descText = (TextView)findViewById(R.id.descText);
         clickButton = (Button)findViewById(R.id.launchButton);
+        rlCard = (RelativeLayout)findViewById(R.id.relativeCard);
+
+
 
         /**Add TextView to the view in order to show matching results. */
         addResultTextView();
@@ -122,6 +131,10 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
         beginAddImages();
     }
 
+    /**
+     * method to add overlay xml on top of the activity
+     */
+    @SuppressWarnings("all")
     private void addView()
     {
         LayoutInflater controlInflater = LayoutInflater.from(getBaseContext());
@@ -130,12 +143,17 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
         this.addContentView(viewControl, layoutParamsControl);
     }
 
+    /**
+     * add images to the queue for recognition from a separate thread
+     * using AsyncTask
+     */
     private void beginAddImages() {
         AddImagesTask ait=new AddImagesTask();
         ait.execute((Void)null);
 
     }
 
+    /**Activity lifecycle method */
     protected void onPause() {
         super.onPause();
         /**Stop matching*/
@@ -143,14 +161,15 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
 
     }
 
+    /**Activity lifecycle method */
     protected void onResume() {
         super.onResume();
         progressDialog=ProgressDialog.show(CameraActivity.this, "Loading", "Setting up the engine");
         aRmatcher.start();
         beginAddImages();
-        //test push
     }
 
+    /**Activity lifecycle method */
     protected void onStop() {
         super.onStop();
         try {
@@ -161,6 +180,7 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
         System.gc();
     }
 
+    /**Activity lifecycle method */
     protected void onDestroy()
     {
         super.onDestroy();
@@ -195,7 +215,7 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
                 q1.setUpdates(x.getUpdates());
                 q1.setIsDownloaded(x.getIsDownloaded());
                 q1.setLocation(x.getLocation());
-                mdataList.add(q1);
+                mDataList.add(q1);
             }
         }
     }
@@ -261,7 +281,7 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
             title.setText(db.getNamex());
             descText.setText(db.getDesc());
             clickButton.setText(db.getIsVideo()?"video":"Web");
-            card.setCardBackgroundColor(db.getIsVideo()?getResources().getColor(R.color.colorAccent):getResources().getColor(R.color.colorPrimary));
+            rlCard.setBackgroundResource(db.getIsVideo()?R.drawable.forth_bg:R.drawable.thrid_bg);
             card.setVisibility(View.VISIBLE);
             clickButton.setOnClickListener(new View.OnClickListener()
             {
@@ -293,6 +313,7 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
         }
     }
 
+    /**method to launch web pages */
     private void launchUrl(String url)
     {
         Intent i = new Intent(Intent.ACTION_VIEW);
@@ -319,8 +340,7 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
     @Override
     public void onMultipleQRrecognitionResult(ArrayList<ROI> roiList) {
         String output = "";
-        int i = 0;
-        for(i=0; i<roiList.size(); i++){
+        for(int i=0; i<roiList.size(); i++){
             if(roiList.get(i).foundResult != null)
                 output += roiList.get(i).foundResult + "\n";
         }
@@ -336,17 +356,16 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
 
     /**
      * Through the AsyncTask the images are added to the library.
-     * @author ARLab
-     *
+     * @author OBX
      */
     private class AddImagesTask extends AsyncTask<Void, Void, Boolean>
     {
 
         @Override
-        protected Boolean doInBackground(Void... params) {
-            //Adding Images
+        protected Boolean doInBackground(Void... params)
+        {
             /** Add image from local resources **/
-            for (ImageQueueObject x:mdataList)
+            for (ImageQueueObject x:mDataList)
             {
                 addImageFromResources(x);
 
