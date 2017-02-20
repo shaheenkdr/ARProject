@@ -11,10 +11,10 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v4.util.ArrayMap;
@@ -36,7 +36,6 @@ import com.arlab.callbacks.ARmatcherImageCallBack;
 import com.arlab.callbacks.ARmatcherQRCallBack;
 import com.arlab.imagerecognition.ARmatcher;
 import com.arlab.imagerecognition.ROI;
-import com.dynamitechetan.flowinggradient.FlowingGradientClass;
 import com.google.android.youtube.player.YouTubeStandalonePlayer;
 import com.xaugmentedreality.arproject.R;
 import com.xaugmentedreality.arproject.realm.ARDatabase;
@@ -127,6 +126,12 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
 
         /**Add TextView to the view in order to show matching results. */
         addResultTextView();
+
+        /**Setting custom fonts for overlay*/
+        Typeface typeface1 = Typeface.createFromAsset(getAssets(), "fonts/robotothin.ttf");
+        Typeface typeface2 = Typeface.createFromAsset(getAssets(), "fonts/robotobold.ttf");
+        descText.setTypeface(typeface1);
+        title.setTypeface(typeface2);
 
         beginAddImages();
     }
@@ -280,8 +285,8 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
             final ImageQueueObject db = imageQueue.get(result);
             title.setText(db.getNamex());
             descText.setText(db.getDesc());
-            clickButton.setText(db.getIsVideo()?"video":"Web");
             rlCard.setBackgroundResource(db.getIsVideo()?R.drawable.forth_bg:R.drawable.thrid_bg);
+            clickButton.setBackgroundResource(db.getIsVideo()?R.drawable.round_button_video:R.drawable.round_button_image);
             card.setVisibility(View.VISIBLE);
             clickButton.setOnClickListener(new View.OnClickListener()
             {

@@ -2,6 +2,7 @@
     <string name="app_name">CamTube</string>
     <string name="about">ABOUT</string>
     <string name="contact">CONTACT</string>
+    <string name="open">OPEN</string>
     <string name="nothing">Nothing found</string>
     <string name="videowall_demo_name">Video Wall</string>
     <string name="videolist_demo_name">Video List</string>
