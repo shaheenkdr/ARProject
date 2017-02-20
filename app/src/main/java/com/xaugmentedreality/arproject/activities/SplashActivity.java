@@ -54,6 +54,7 @@ public class SplashActivity extends AppCompatActivity {
 
 
     @Override
+    @SuppressWarnings("deprecation")
     protected void onCreate(Bundle savedInstanceState)
     {
         setTheme(R.style.AppThemeSecondary);
@@ -68,14 +69,7 @@ public class SplashActivity extends AppCompatActivity {
         final String TEST ="";
         SharedPreferences pref = getSharedPreferences("OnBoardCheck", Context.MODE_PRIVATE);
         String check = pref.getString("HASH","");
-        if(check.equals(TEST))
-        {
-            isFirstTime = true;
-        }
-        else
-        {
-            isFirstTime = false;
-        }
+        isFirstTime = check.equals(TEST);
 
         mIntent = new Intent(SplashActivity.this,CameraActivity.class);
         mIntentIntro = new Intent(SplashActivity.this,AppIntro.class);
