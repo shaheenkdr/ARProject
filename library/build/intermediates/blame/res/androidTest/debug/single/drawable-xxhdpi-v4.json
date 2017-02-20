@@ -88,16 +88,16 @@
         "source": "/home/obx/Documents/ARProject/library/build/intermediates/exploded-aar/com.android.support/appcompat-v7/25.0.1/res/drawable-xxhdpi-v4/abc_popup_background_mtrl_mult.9.png"
     },
     {
-        "merged": "/home/obx/Documents/ARProject/library/build/intermediates/res/merged/androidTest/debug/drawable-xxhdpi-v4/abc_ic_menu_cut_mtrl_alpha.png",
-        "source": "/home/obx/Documents/ARProject/library/build/intermediates/exploded-aar/com.android.support/appcompat-v7/25.0.1/res/drawable-xxhdpi-v4/abc_ic_menu_cut_mtrl_alpha.png"
-    },
-    {
         "merged": "/home/obx/Documents/ARProject/library/build/intermediates/res/merged/androidTest/debug/drawable-xxhdpi-v4/abc_btn_check_to_on_mtrl_000.png",
         "source": "/home/obx/Documents/ARProject/library/build/intermediates/exploded-aar/com.android.support/appcompat-v7/25.0.1/res/drawable-xxhdpi-v4/abc_btn_check_to_on_mtrl_000.png"
     },
     {
         "merged": "/home/obx/Documents/ARProject/library/build/intermediates/res/merged/androidTest/debug/drawable-xxhdpi-v4/abc_scrubber_control_off_mtrl_alpha.png",
         "source": "/home/obx/Documents/ARProject/library/build/intermediates/exploded-aar/com.android.support/appcompat-v7/25.0.1/res/drawable-xxhdpi-v4/abc_scrubber_control_off_mtrl_alpha.png"
+    },
+    {
+        "merged": "/home/obx/Documents/ARProject/library/build/intermediates/res/merged/androidTest/debug/drawable-xxhdpi-v4/abc_ic_menu_cut_mtrl_alpha.png",
+        "source": "/home/obx/Documents/ARProject/library/build/intermediates/exploded-aar/com.android.support/appcompat-v7/25.0.1/res/drawable-xxhdpi-v4/abc_ic_menu_cut_mtrl_alpha.png"
     },
     {
         "merged": "/home/obx/Documents/ARProject/library/build/intermediates/res/merged/androidTest/debug/drawable-xxhdpi-v4/abc_scrubber_track_mtrl_alpha.9.png",

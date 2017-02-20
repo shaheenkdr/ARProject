@@ -34,6 +34,7 @@
         <View
             android:id="@+id/horizontalRule"
             android:alpha="0.5"
+            android:layout_marginTop="2dp"
             android:layout_below="@+id/titleText"
             android:layout_margin="3dp"
             android:layout_width="fill_parent"

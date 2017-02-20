@@ -207,6 +207,8 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
 
         for(ARDatabase x:results)
         {
+            Log.e("TAGZ","DOWNLOAD STATUS"+x.getIsDownloaded()+" UID:"+x.getUid());
+
             if(x.getIsDownloaded())
             {
                 ImageQueueObject q1 = new ImageQueueObject();
@@ -221,12 +223,13 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
                 q1.setIsDownloaded(x.getIsDownloaded());
                 q1.setLocation(x.getLocation());
                 mDataList.add(q1);
+
             }
         }
     }
 
 
-    private int addImageFromResources(ImageQueueObject db) {
+    private synchronized int addImageFromResources(ImageQueueObject db) {
         /**Add images from local resources to image matching pool
          * Adding image returns image id assigned to the image in the matching pool.
          * We will save it to know which image was matched
@@ -247,9 +250,10 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
         if(imagePool_Id != -1){
             imageQueue.put(imagePool_Id,db);
 
-            Log.e("TAG","image added to the pool with id: " + imagePool_Id);
-        }else{
-            Log.e("TAG","image not added to the pool");
+            Log.e("TAGZ","image added to the pool with id: " + db.getUid());
+        }else
+        {
+            Log.e("TAGZ","image not added to the pool"+ db.getUid());
         }
 
         bmp.recycle();

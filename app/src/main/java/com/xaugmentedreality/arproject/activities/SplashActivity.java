@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Handler;
+import android.os.StrictMode;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -45,14 +46,16 @@ public class SplashActivity extends AppCompatActivity {
     private List<DownLoadList> mdataCollection;
     private Intent mIntent;
     private Intent mIntentIntro;
-    private SharedPreferences pref;
     private boolean isFirstTime;
     private SmoothProgressBar sm;
-
+    private boolean isDownloadEnabled = false;
+    private int totalTaskCount = 0;
+    private int finishedTaskCount = 0;
 
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         setTheme(R.style.AppThemeSecondary);
         super.onCreate(savedInstanceState);
 
@@ -63,7 +66,7 @@ public class SplashActivity extends AppCompatActivity {
         mRealm = Realm.getInstance(this);
 
         final String TEST ="";
-        pref = getSharedPreferences("OnBoardCheck", Context.MODE_PRIVATE);
+        SharedPreferences pref = getSharedPreferences("OnBoardCheck", Context.MODE_PRIVATE);
         String check = pref.getString("HASH","");
         if(check.equals(TEST))
         {
@@ -104,18 +107,7 @@ public class SplashActivity extends AppCompatActivity {
         else
         {
             Log.e("TAG","NO INTERNET CONNECTION");
-            if(isFirstTime)
-            {
-                startActivity(mIntentIntro);
-                finish();
-            }
-            else
-            {
-                startActivity(mIntent);
-                finish();
-            }
-
-
+            launchActivity();
         }
 
     }
@@ -143,17 +135,7 @@ public class SplashActivity extends AppCompatActivity {
             public void onCancelled(FirebaseError firebaseError) {
                 Log.e("TAG","FIREBASE RETRIEVAL FAILED");
                 Log.e("data error", firebaseError.getMessage());
-                if(isFirstTime)
-                {
-                    startActivity(mIntentIntro);
-                    finish();
-                }
-                else
-                {
-                    startActivity(mIntent);
-                    finish();
-                }
-
+                launchActivity();
             }
         });
     }
@@ -188,7 +170,6 @@ public class SplashActivity extends AppCompatActivity {
                             db.setUrlImg(itemx.getUrlImage());
                             db.setUrlApp(itemx.getUrlApp());
                             db.setUpdates(itemx.getUpdated());
-                            Log.e("THIN",""+db.getUpdates());
                             db.setIsDownloaded(false);
                             db.setLocation("X");
                         }
@@ -320,7 +301,16 @@ public class SplashActivity extends AppCompatActivity {
                 db.setLocation(location_address);
             }
         });
-        Log.e("TAG","DOWNLOAD UPDATE COMPLETED");
+
+        Log.e("TAGZ","UID ADDED:"+uid);
+        if(isDownloadEnabled)
+        {
+            if(finishedTaskCount>=totalTaskCount)
+            {
+                launchActivity();
+            }
+
+        }
 
     }
 
@@ -333,7 +323,8 @@ public class SplashActivity extends AppCompatActivity {
     {
         mRealm.executeTransaction(new Realm.Transaction() {
             @Override
-            public void execute(Realm realm) {
+            public void execute(Realm realm)
+            {
                 ARDatabase db = realm.where(ARDatabase.class).equalTo("uid", item.getUid()).findFirst();
                 db.setNamex(item.getTitle());
                 db.setDesc(item.getDesc());
@@ -346,6 +337,7 @@ public class SplashActivity extends AppCompatActivity {
                 db.setLocation("X");
             }
         });
+
     }
 
     /**
@@ -379,11 +371,24 @@ public class SplashActivity extends AppCompatActivity {
                 @Override
                 protected void completed(BaseDownloadTask task)
                 {
+
+                    ++finishedTaskCount;
                     try {
                         downloadUpdateDatabase(task.getFilename().replaceAll(".jpg", ""), String.valueOf(getExternalCacheDir()) + "/");
                     }
-                    catch (Exception e){ e.printStackTrace(); Log.e("TAG","UPDATE CRASH");}
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                        Log.e("TAG","UPDATE CRASH::"+e.toString());
+                    }
+
                     Log.e("TAG","NAME:"+task.getFilename().replaceAll(".jpg","")+" ID: "+task.getId());
+                    Log.e("TAGX","taskCount:"+totalTaskCount+"finishedtaskcount:"+finishedTaskCount);
+                   /* try {
+                        downloadUpdateDatabase(task.getFilename().replaceAll(".jpg", ""), String.valueOf(getExternalCacheDir()) + "/");
+                    }
+                    catch (Exception e){ e.printStackTrace(); Log.e("TAG","UPDATE CRASH");}
+                    Log.e("TAG","NAME:"+task.getFilename().replaceAll(".jpg","")+" ID: "+task.getId());*/
                 }
 
                 @Override
@@ -401,7 +406,7 @@ public class SplashActivity extends AppCompatActivity {
 
             File sd = getExternalCacheDir();
             final FileDownloadQueueSet queueSet = new FileDownloadQueueSet(queueTarget);
-            final int taskCount = mdataCollection.size();
+            totalTaskCount = mdataCollection.size();
 
             final List<BaseDownloadTask> tasks = new ArrayList<>();
             for (DownLoadList x:mdataCollection)
@@ -409,43 +414,39 @@ public class SplashActivity extends AppCompatActivity {
                 tasks.add(FileDownloader.getImpl().create(x.getImageUrl()).setPath(String.valueOf(sd)+"/"+x.getUid()+".jpg").setTag(x.getUid()));
             }
             queueSet.disableCallbackProgressTimes();
+            isDownloadEnabled = true;
             queueSet.downloadSequentially(tasks);
             queueSet.addTaskFinishListener(new BaseDownloadTask.FinishListener() {
-                int finishedTaskCount = 0;
+
                 @Override
                 public void over(BaseDownloadTask task)
                 {
-                    Log.e("TAGX","taskCount:"+taskCount+"finishedtaskcount:"+finishedTaskCount);
-                    ++finishedTaskCount;
-                    if(finishedTaskCount==taskCount)
-                    {
-                        if(isFirstTime)
-                        {
-                            startActivity(mIntentIntro);
-                            finish();
-                        }
-                        else
-                        {
-                            startActivity(mIntent);
-                            finish();
-                        }
-                    }
+
                 }
             });
             queueSet.start();
         }
         else
         {
-            if(isFirstTime)
-            {
-                startActivity(mIntentIntro);
-                finish();
-            }
-            else
-            {
-                startActivity(mIntent);
-                finish();
-            }
+            launchActivity();
+        }
+
+    }
+
+    /**
+     * method to launch the next activity
+     */
+    private void launchActivity()
+    {
+        if(isFirstTime)
+        {
+            startActivity(mIntentIntro);
+            finish();
+        }
+        else
+        {
+            startActivity(mIntent);
+            finish();
         }
 
     }
