@@ -68,9 +68,10 @@
 
     <android.support.v7.widget.CardView
         android:id="@+id/bottomCard"
+        android:alpha="0.5"
         android:layout_alignParentBottom="true"
         android:layout_width="match_parent"
-        android:layout_height="60dp">
+        android:layout_height="50dp">
 
 
 
@@ -86,9 +87,11 @@
                android:layout_height="match_parent">
 
                <TextView
+                   android:id="@+id/aboutText"
                    android:text="@string/about"
+                   android:textColor="#4c4a4a"
+                   android:textSize="16sp"
                    android:layout_centerInParent="true"
-
                    android:layout_width="wrap_content"
                    android:layout_height="wrap_content" />
 
@@ -102,7 +105,10 @@
                android:layout_height="match_parent">
 
                <TextView
+                   android:id="@+id/contactText"
                    android:text="@string/contact"
+                   android:textColor="#4c4a4a"
+                   android:textSize="16sp"
                    android:layout_centerInParent="true"
                    android:layout_width="wrap_content"
                    android:layout_height="wrap_content" />
@@ -112,9 +118,9 @@
 
         <View
             android:layout_gravity="center"
-            android:layout_width="2dp"
-            android:layout_height="30dp"
-            android:background="#FF0000FF" />
+            android:layout_width="3dp"
+            android:layout_height="35dp"
+            android:background="#bababa" />
 
     </android.support.v7.widget.CardView>
 

@@ -9,7 +9,6 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -19,7 +18,6 @@ import android.support.v7.widget.CardView;
 import android.support.v4.util.ArrayMap;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
@@ -58,7 +56,6 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
 
     private List<ImageQueueObject> mDataList;
     private Realm mRealm;
-    TextView textView = null;
     private TextView title;
     private CardView card;
     private TextView descText;
@@ -121,17 +118,16 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
         clickButton = (Button)findViewById(R.id.launchButton);
         rlCard = (RelativeLayout)findViewById(R.id.relativeCard);
 
-
-
-        /**Add TextView to the view in order to show matching results. */
-        addResultTextView();
-
         /**Setting custom fonts for overlay*/
         Typeface typeface1 = Typeface.createFromAsset(getAssets(), "fonts/robotothin.ttf");
         Typeface typeface2 = Typeface.createFromAsset(getAssets(), "fonts/robotobold.ttf");
         descText.setTypeface(typeface1);
         title.setTypeface(typeface2);
 
+        TextView aboutText = (TextView)findViewById(R.id.aboutText);
+        TextView contactText = (TextView)findViewById(R.id.contactText);
+        aboutText.setTypeface(typeface2);
+        contactText.setTypeface(typeface2);
         beginAddImages();
     }
 
@@ -260,21 +256,6 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
         return imagePool_Id;
     }
 
-
-
-
-    /**Add TextView to the screen to show the matching results. */
-    private void addResultTextView()
-    {
-        textView = new TextView(this);
-        textView.setTextColor(Color.WHITE);
-        textView.setTextSize(23);
-        FrameLayout.LayoutParams frame = new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
-                LayoutParams.WRAP_CONTENT,Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM);
-
-        addContentView(textView,frame);
-    }
-
     /**Callback that will accept all IMAGE matching results */
     @Override
     public void onImageRecognitionResult(int result)
@@ -315,9 +296,7 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
         }
         else
         {
-
             card.setVisibility(View.INVISIBLE);
-            textView.setText(R.string.nothing);
         }
     }
 
@@ -335,28 +314,20 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
     public void onSingleQRrecognitionResult(String result) {
         if(!result.equals(""))
         {
-            textView.setText(result);
             Toast.makeText(getApplication(), result, Toast.LENGTH_SHORT).show();
-        }
-        else
-        {
-            textView.setText(R.string.nothing);
         }
     }
 
     /**Callback that will accept all QR codes matching results */
     @Override
+    @SuppressWarnings("UnusedDeclaration")
     public void onMultipleQRrecognitionResult(ArrayList<ROI> roiList) {
         String output = "";
         for(int i=0; i<roiList.size(); i++){
             if(roiList.get(i).foundResult != null)
                 output += roiList.get(i).foundResult + "\n";
         }
-        textView.setText(output);
-        if(output.equals(""))
-        {
-            textView.setText(R.string.nothing);
-        }
+
     }
 
 
