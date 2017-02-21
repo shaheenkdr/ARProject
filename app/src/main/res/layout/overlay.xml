@@ -82,6 +82,7 @@
            <RelativeLayout
                android:layout_weight="1"
                android:layout_width="0dp"
+               android:onClick="aboutLauncher"
                android:layout_height="match_parent">
 
                <TextView

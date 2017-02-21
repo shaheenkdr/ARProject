@@ -27,21 +27,29 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activities.SplashActivity" android:theme="@style/AppTheme.Launcher">
+        <activity
+            android:name=".activities.SplashActivity"
+            android:theme="@style/AppTheme.Launcher">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.CameraActivity" android:configChanges="keyboardHidden|screenLayout|screenSize" android:theme="@style/AppThemeSecondary"/>
-
-        <activity android:name=".activities.AppIntro"
-            android:label="@string/app_name" android:theme="@style/AppThemeSecondary" />
+        <activity
+            android:name=".activities.CameraActivity"
+            android:configChanges="keyboardHidden|screenLayout|screenSize"
+            android:theme="@style/AppThemeSecondary" />
+        <activity
+            android:name=".activities.AppIntro"
+            android:label="@string/app_name"
+            android:theme="@style/AppThemeSecondary" />
 
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="b4010acca4e45769691279b63de4ddb460606a09" />
+
+        <activity android:name=".activities.AboutActivity" android:theme="@style/AppThemeSecondary"/>
     </application>
 
 </manifest>

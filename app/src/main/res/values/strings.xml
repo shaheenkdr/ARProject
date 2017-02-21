@@ -1,10 +1,13 @@
 <resources>
-    <string name="app_name">CamTube</string>
+    <string name="app_name">PicGinger</string>
     <string name="about">ABOUT</string>
     <string name="contact">CONTACT</string>
     <string name="open">OPEN</string>
+    <string name="copyright">&#169; 2017 PicGinger inc.</string>
+    <string name="reserved">All rights reserved</string>
     <string name="nothing">Nothing found</string>
     <string name="videowall_demo_name">Video Wall</string>
+    <string name="version">Version 1.0.0</string>
     <string name="videolist_demo_name">Video List</string>
     <string name="standalone_player_demo_name">Standalone Player</string>
     <string name="playerview_demo_name">Simple PlayerView</string>

@@ -6,7 +6,6 @@ import java.util.List;
 
 
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -66,7 +65,7 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
     private Button clickButton;
     private ProgressDialog progressDialog;
     private RelativeLayout rlCard;
-    private final Context mContext = CameraActivity.this;
+
 
 
     @SuppressWarnings("deprecation")
@@ -99,7 +98,7 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
 
         /**Set image and QR matching callbacks */
         aRmatcher.setImageRecognitionCallback(this);
-        //aRmatcher.setQRRecognitionCallback(this);
+        aRmatcher.setQRRecognitionCallback(this);
 
         /**Add camera view instance to content view */
         frame.addView(aRmatcher.getCameraViewInstance());
@@ -411,6 +410,15 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
         if (intent.resolveActivity(getPackageManager()) != null) {
             startActivity(intent);
         }
+    }
+
+    /**
+     * method to launch the about app activity
+     * @param view view object
+     */
+    public void aboutLauncher(View view)
+    {
+        startActivity(new Intent(CameraActivity.this,AboutActivity.class));
     }
 
 }

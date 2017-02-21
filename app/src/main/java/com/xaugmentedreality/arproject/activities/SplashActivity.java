@@ -95,12 +95,10 @@ public class SplashActivity extends AppCompatActivity {
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         if (activeNetwork != null)
         {
-            Log.e("TAG","HAS INTERNET CONNECTION");
             retrieveData();
         }
         else
         {
-            Log.e("TAG","NO INTERNET CONNECTION");
             launchActivity();
         }
 
@@ -119,7 +117,6 @@ public class SplashActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
 
                 sm.setVisibility(View.VISIBLE);
-                Log.e("TAG","FIREBASE DATA RETRIEVED");
                 mData = dataSnapshot.getValue(DataPojo.class);
                 insertToDatabase();
 
@@ -127,8 +124,6 @@ public class SplashActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(FirebaseError firebaseError) {
-                Log.e("TAG","FIREBASE RETRIEVAL FAILED");
-                Log.e("data error", firebaseError.getMessage());
                 launchActivity();
             }
         });
@@ -138,6 +133,7 @@ public class SplashActivity extends AppCompatActivity {
      * method to insert records to realm database
      * if the record already does not exist
      */
+    @SuppressWarnings("unused")
     private void insertToDatabase()
     {
         final List<Item> items = mData.getItems();
@@ -173,29 +169,21 @@ public class SplashActivity extends AppCompatActivity {
                 {
                     if(!itemx.getIsdeleted())
                     {
-                        Log.e("TAGX","RECORD EXISTS");
-
                         ARDatabase query = mRealm.where(ARDatabase.class).equalTo("uid",itemx.getUid()).findFirst();
 
                         if(itemx.getUpdated()>query.getUpdates())
                         {
-                            Log.e("TAGX","RECORD UPDATE DETECTED");
                             networkUpdateDatabase(itemx);
                         }
                     }
                     else
                     {
-                        Log.e("TAG","DELETED ITEM DETECTED");
                         File file = new File(String.valueOf(getExternalCacheDir())+"/"+itemx.getUid()+".jpg");
                         if(file.exists())
                         {
                             boolean res = deleteImage(String.valueOf(file));
-                            Log.e("TAG","DELETION STATUS:"+res);
                         }
-                        else
-                        {
-                            Log.e("TAG","FILE DOESN'T EXIST");
-                        }
+
                         deleteFromRealm(itemx.getUid());
                     }
 
@@ -207,7 +195,6 @@ public class SplashActivity extends AppCompatActivity {
             catch (Exception e)
             {
                 e.printStackTrace();
-                Log.e("TAG","EXCEPTION"+e);
             }
 
         }
@@ -254,7 +241,6 @@ public class SplashActivity extends AppCompatActivity {
 
             if(!x.getIsDownloaded())
             {
-                Log.e("TAG","D List:"+x.getNamex());
                 mdataCollection.add(new DownLoadList(x.getUrlImg(),x.getUid(),x.getNamex()));
             }
         }
@@ -296,7 +282,6 @@ public class SplashActivity extends AppCompatActivity {
             }
         });
 
-        Log.e("TAGZ","UID ADDED:"+uid);
         if(isDownloadEnabled)
         {
             if(finishedTaskCount>=totalTaskCount)
@@ -373,16 +358,8 @@ public class SplashActivity extends AppCompatActivity {
                     catch (Exception e)
                     {
                         e.printStackTrace();
-                        Log.e("TAG","UPDATE CRASH::"+e.toString());
                     }
 
-                    Log.e("TAG","NAME:"+task.getFilename().replaceAll(".jpg","")+" ID: "+task.getId());
-                    Log.e("TAGX","taskCount:"+totalTaskCount+"finishedtaskcount:"+finishedTaskCount);
-                   /* try {
-                        downloadUpdateDatabase(task.getFilename().replaceAll(".jpg", ""), String.valueOf(getExternalCacheDir()) + "/");
-                    }
-                    catch (Exception e){ e.printStackTrace(); Log.e("TAG","UPDATE CRASH");}
-                    Log.e("TAG","NAME:"+task.getFilename().replaceAll(".jpg","")+" ID: "+task.getId());*/
                 }
 
                 @Override
