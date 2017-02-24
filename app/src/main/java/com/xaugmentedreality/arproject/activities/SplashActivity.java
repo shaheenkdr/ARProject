@@ -13,8 +13,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
-import com.crashlytics.android.Crashlytics;
-import com.crashlytics.android.ndk.CrashlyticsNdk;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
@@ -34,7 +32,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
-import io.fabric.sdk.android.Fabric;
 import io.realm.Realm;
 import io.realm.RealmResults;
 import io.realm.exceptions.RealmException;
@@ -59,8 +56,6 @@ public class SplashActivity extends AppCompatActivity {
     {
         setTheme(R.style.AppThemeSecondary);
         super.onCreate(savedInstanceState);
-
-        Fabric.with(this, new Crashlytics(), new CrashlyticsNdk());
 
         setContentView(R.layout.activity_splash);
 

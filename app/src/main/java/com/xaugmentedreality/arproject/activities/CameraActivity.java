@@ -101,7 +101,7 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
         frame.addView(aRmatcher.getCameraViewInstance());
 
         /**Set the matching type.*/
-        aRmatcher.setMatchingType(ARmatcher.IMAGE_MATCHER);
+        aRmatcher.setMatchingType(ARmatcher.BOTH_IMAGE_AND_QR_MATCHER);
 
         /**Enable median filter ,witch help to reduce noise and mismatches in IMAGE matching .(Optional) */
         aRmatcher.enableMedianFilter(true);
