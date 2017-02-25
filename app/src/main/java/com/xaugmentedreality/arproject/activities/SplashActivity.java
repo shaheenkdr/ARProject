@@ -5,18 +5,18 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.Handler;
-import android.os.StrictMode;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.ValueEventListener;
+import com.google.firebase.crash.FirebaseCrash;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.liulishuo.filedownloader.BaseDownloadTask;
 import com.liulishuo.filedownloader.FileDownloadListener;
 import com.liulishuo.filedownloader.FileDownloadQueueSet;
@@ -106,19 +106,17 @@ public class SplashActivity extends AppCompatActivity {
      */
     private void retrieveData()
     {
-        Firebase fRef = new Firebase("https://project-ar-312a4.firebaseio.com/");
+        DatabaseReference fRef = FirebaseDatabase.getInstance().getReference();
         fRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-
                 sm.setVisibility(View.VISIBLE);
                 mData = dataSnapshot.getValue(DataPojo.class);
                 insertToDatabase();
-
             }
-
             @Override
-            public void onCancelled(FirebaseError firebaseError) {
+            public void onCancelled(DatabaseError databaseError)
+            {
                 launchActivity();
             }
         });
@@ -126,19 +124,17 @@ public class SplashActivity extends AppCompatActivity {
 
     /**
      * method to insert records to realm database
-     * if the record already does not exist
+     * if the record does not exist already
      */
     @SuppressWarnings("unused")
     private void insertToDatabase()
     {
         final List<Item> items = mData.getItems();
-        if(items.size()>=10)
-        {
-            Snackbar.make(this.findViewById(android.R.id.content), "Please wait while the app synchronizes", Snackbar.LENGTH_SHORT).show();
-        }
+        Snackbar.make(this.findViewById(android.R.id.content), "Please wait while the app synchronizes", Snackbar.LENGTH_SHORT).show();
         for(Item x:items)
         {
             final Item itemx = x;
+            Log.e("TAG-D",""+itemx.getTitle());
             try
             {
                 if(mRealm.where(ARDatabase.class).equalTo("uid",itemx.getUid()).findFirst()==null && !itemx.getIsdeleted())

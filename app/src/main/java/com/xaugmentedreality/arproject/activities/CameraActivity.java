@@ -54,6 +54,12 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
 
 
 
+    TextView textView = null;
+    private int screenheight;
+    private int screenwidth;
+    private FrameLayout frame;
+    private RelativeLayout grid;
+    private RelativeLayout crop;
     private List<ImageQueueObject> mDataList;
     private Realm mRealm;
     private TextView title;
@@ -73,19 +79,21 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
         /**Get full screen size */
         DisplayMetrics displaymetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-        int screenheight = getWindowManager().getDefaultDisplay().getHeight();
-        int screenwidth = getWindowManager().getDefaultDisplay().getWidth();
+        screenheight = getWindowManager().getDefaultDisplay().getHeight();
+        screenwidth = getWindowManager().getDefaultDisplay().getWidth();
 
 
         /** Set activity view*/
         setContentView(R.layout.activity_camera);
         imageQueue=new ArrayMap<>();
-        FrameLayout frame = (FrameLayout)findViewById(R.id.frame);
+        frame = (FrameLayout)findViewById(R.id.frame);
+        grid=(RelativeLayout)findViewById(R.id.grid);
+        crop=(RelativeLayout)findViewById(R.id.crop);
 
         /** Initiate Realm db*/
         mRealm = Realm.getInstance(this);
         mDataList = new ArrayList<>();
-        generateImageQueue();
+
 
         /**Create an instance of the ARmatcher object. */
         aRmatcher = new ARmatcher(this,API_KEY_MATCHER,ARmatcher.SCREEN_ORIENTATION_PORTRAIT,screenwidth,screenheight,true);
@@ -110,6 +118,8 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
         aRmatcher.setImageQuality(2);
 
         addView();
+
+        generateImageQueue();
 
         /** bind overlay xml items to code*/
         title = (TextView)findViewById(R.id.titleText);
@@ -191,6 +201,115 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
     }
 
 
+    protected void setCroppingArea() {
+        /**Select cropping area to be analyzed */
+        /**
+         * Take in consideration that the cropping area is defined on landscape and portrait modes differently,
+         * In Portrait Mode the (0,0) point will be the upper left corner holding the device portrait ,
+         *  In Landscape Mode the (0,0) point will be the upper left corner holding the device landscape left (upper right in portrait)
+         *
+         */
+
+        /**Set cropping area in TABLET or DEVICES where Camera Preview is NOT set to full screen */
+        /**
+         * Here we use camerawidth and cameraweight because of the camera preview that is not
+         * in a full screen of the device, so we need to know
+         * the exact size to not exceed the camera view borders.
+         *
+         * the screenwidth and screenheight used for drawing the red rectangel marker
+         *
+         */
+    	/*aRmatcher.setImageCropRect(camerawidth/2, 0, camerawidth, cameraheight/2);
+
+    	RelativeLayout.LayoutParams p=new RelativeLayout.LayoutParams(screenwidth/2, screenheight/2);
+        p.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+        p.addRule(RelativeLayout.ALIGN_PARENT_TOP);*/
+
+
+
+        /**Set cropping area in PHONES or Devices with camera preview set to full screen */
+        /**
+         * Here we use screenwidth and screenwidth for both cropping and drawing the marker rectangle
+         * becasue of the full video preview
+         *
+         *
+         */
+        aRmatcher.setImageCropRect(screenwidth/2, 0, screenwidth, screenheight/2);
+
+        RelativeLayout.LayoutParams p=new RelativeLayout.LayoutParams(screenwidth/2, screenheight/2);
+        p.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+        p.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+
+
+
+        crop.setLayoutParams(p);
+        crop.setVisibility(View.VISIBLE);
+    }
+
+    protected void setROIs() {
+        /**Add 4 ROIs */
+        /**
+         * We define 4 regions of interest on the mobile screen to match simultaneous QR codes.
+         */
+        /**
+         * Take in consideration that the cropping area is defined on landscape and portrait modes differently,
+         * In Portrait Mode the (0,0) point will be the upper left corner holding the device portrait ,
+         *  In Landscape Mode the (0,0) point will be the upper left corner holding the device landscape left (upper right in portrait)
+         *
+         */
+        //ROI1
+        ROI r = new ROI(0, 0, screenwidth/2, screenheight/2);
+        aRmatcher.addRoi(r);
+        //ROI2
+        r = new ROI(0,screenheight/2, screenwidth/2, screenheight/2);
+        aRmatcher.addRoi(r);
+        //ROI3
+        r = new ROI(screenwidth/2,0,screenwidth/2, screenheight/2);
+        aRmatcher.addRoi(r);
+        //ROI4
+        r = new ROI(screenwidth/2, screenheight/2,screenwidth/2, screenheight/2);
+        aRmatcher.addRoi(r);
+        grid.setVisibility(View.VISIBLE);
+    }
+
+    private int addLargeImageWithId(int resource, String title, int id, int maxSize) {
+
+        /**Add LARGE (High resolution) image with unique ID*/
+
+        /**
+         * The API provides a helper function to reduce the image size, to avoid memory allocation errors.
+         */
+        Bitmap b = aRmatcher.decodeScaledImageFromResource(resource, maxSize);
+
+        if(aRmatcher.addImage(b,id)){
+
+            b.recycle();
+
+            Log.i("TAG","image added to the pool with id: " + id);
+        }else{
+            Log.i("TAG","image not added to the pool");
+        }
+
+        return id;
+    }
+
+    private int addImageFromURL(String url, String title) {
+        /**Add image from URL */
+        /**It is possible to load remote images to the image pool by setting a valid URL */
+
+        int imagePool_Id = aRmatcher.addImage(url);
+        if(imagePool_Id != -1){
+            //imageTitles.put(imagePool_Id,title);
+            Log.i("TAG","image added to the pool with id: " + imagePool_Id);
+        }else{
+            Log.i("TAG","image not added to the pool");
+        }
+
+        return imagePool_Id;
+    }
+
+
+
     /**
      * method to fetch the objects from realm and add to the data
      * collection to be added to the Image loader of the
@@ -255,6 +374,40 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
 
         return imagePool_Id;
     }
+
+    private int addImageDataFromPath(String path,String title)
+    {
+        int imagePool_Id ;
+
+        imagePool_Id = aRmatcher.addImageFromData(path);
+
+        if(imagePool_Id != -1){
+            //imageTitles.put(imagePool_Id,title);
+
+            Log.i("TAG","image added to the pool with id: " + imagePool_Id);
+        }else{
+            Log.i("TAG","image not added to the pool");
+        }
+
+        return imagePool_Id;
+    }
+
+    @SuppressWarnings("unused")
+    private int addImageDataFromUrl(String url,String title)
+    {
+        int imagePool_Id ;
+
+        imagePool_Id = aRmatcher.addImageFromDataThroughUrl(url);
+
+        if(imagePool_Id != -1){
+            //imageTitles.put(imagePool_Id,title);
+            Log.i("TAG","image added to the pool with id: " + imagePool_Id);
+        }else{
+            Log.i("TAG","image not added to the pool");
+        }
+        return imagePool_Id;
+    }
+
 
     /**Callback that will accept all IMAGE matching results */
     @Override
