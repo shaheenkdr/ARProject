@@ -134,10 +134,6 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
         descText.setTypeface(typeface1);
         title.setTypeface(typeface2);
 
-        TextView aboutText = (TextView)findViewById(R.id.aboutText);
-        TextView contactText = (TextView)findViewById(R.id.contactText);
-        aboutText.setTypeface(typeface2);
-        contactText.setTypeface(typeface2);
         beginAddImages();
     }
 
@@ -519,30 +515,9 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
         }
     }
 
-
-    /**
-     * method to open the email app using intent
-     * to contact the app developer teams
-     * @param view view object
-     */
-    public void emailLauncher(View view)
+    public void openSettings(View view)
     {
-        Intent intent = new Intent(Intent.ACTION_SENDTO);
-        intent.setData(Uri.parse("mailto:")); // only email apps should handle this
-        intent.putExtra(Intent.EXTRA_EMAIL, new String[]{"picgingermail@gmail.com"});
-        intent.putExtra(Intent.EXTRA_SUBJECT, "pic-ginger enquiry");
-        if (intent.resolveActivity(getPackageManager()) != null) {
-            startActivity(intent);
-        }
-    }
-
-    /**
-     * method to launch the about app activity
-     * @param view view object
-     */
-    public void aboutLauncher(View view)
-    {
-        startActivity(new Intent(CameraActivity.this,AboutActivity.class));
+        startActivity(new Intent(CameraActivity.this,SettingsActivity.class));
     }
 
 }

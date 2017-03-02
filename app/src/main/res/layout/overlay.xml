@@ -5,6 +5,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:gradient="http://schemas.android.com/tools">
 
+    <ImageButton
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="10dp"
+        android:background="?android:selectableItemBackground"
+        android:src="@drawable/ic_menu_black_24dp"
+        android:onClick="openSettings"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
 <android.support.v7.widget.CardView
     android:id="@+id/card"
     android:visibility="invisible"
@@ -66,62 +75,5 @@
 
 </android.support.v7.widget.CardView>
 
-    <android.support.v7.widget.CardView
-        android:id="@+id/bottomCard"
-        android:alpha="0.5"
-        android:layout_alignParentBottom="true"
-        android:layout_width="match_parent"
-        android:layout_height="50dp">
-
-
-
-
-       <LinearLayout
-           android:layout_width="match_parent"
-           android:layout_height="match_parent">
-
-           <RelativeLayout
-               android:layout_weight="1"
-               android:layout_width="0dp"
-               android:onClick="aboutLauncher"
-               android:layout_height="match_parent">
-
-               <TextView
-                   android:id="@+id/aboutText"
-                   android:text="@string/about"
-                   android:textColor="#4c4a4a"
-                   android:textSize="16sp"
-                   android:layout_centerInParent="true"
-                   android:layout_width="wrap_content"
-                   android:layout_height="wrap_content" />
-
-
-           </RelativeLayout>
-
-           <RelativeLayout
-               android:layout_weight="1"
-               android:layout_width="0dp"
-               android:onClick="emailLauncher"
-               android:layout_height="match_parent">
-
-               <TextView
-                   android:id="@+id/contactText"
-                   android:text="@string/contact"
-                   android:textColor="#4c4a4a"
-                   android:textSize="16sp"
-                   android:layout_centerInParent="true"
-                   android:layout_width="wrap_content"
-                   android:layout_height="wrap_content" />
-
-           </RelativeLayout>
-       </LinearLayout>
-
-        <View
-            android:layout_gravity="center"
-            android:layout_width="3dp"
-            android:layout_height="35dp"
-            android:background="#bababa" />
-
-    </android.support.v7.widget.CardView>
 
 </RelativeLayout>
