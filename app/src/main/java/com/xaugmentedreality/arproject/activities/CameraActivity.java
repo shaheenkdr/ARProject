@@ -38,10 +38,12 @@ import com.arlab.imagerecognition.ROI;
 import com.google.android.youtube.player.YouTubeStandalonePlayer;
 import com.xaugmentedreality.arproject.R;
 import com.xaugmentedreality.arproject.realm.ARDatabase;
+import com.xaugmentedreality.arproject.realm.VideoDatabase;
 import com.xaugmentedreality.arproject.utility.DeveloperKey;
 import com.xaugmentedreality.arproject.utility.ImageQueueObject;
 
 import io.realm.Realm;
+import io.realm.RealmConfiguration;
 import io.realm.RealmResults;
 
 public class CameraActivity extends AppCompatActivity implements ARmatcherImageCallBack, ARmatcherQRCallBack {
@@ -64,6 +66,7 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
     private RelativeLayout crop;
     private List<ImageQueueObject> mDataList;
     private Realm mRealm;
+    private Realm mVideoRealm;
     private TextView title;
     private CardView card;
     private TextView descText;
@@ -100,6 +103,11 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
         mRealm = Realm.getInstance(this);
         mDataList = new ArrayList<>();
 
+        mVideoRealm = Realm.getInstance(
+                new RealmConfiguration.Builder(this)
+                        .name("videoDb.realm")
+                        .build()
+        );
 
         /**Create an instance of the ARmatcher object. */
         aRmatcher = new ARmatcher(this,API_KEY_MATCHER,ARmatcher.SCREEN_ORIENTATION_PORTRAIT,screenwidth,screenheight,true);
@@ -439,6 +447,7 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
                 {
                     if(db.getIsVideo())
                     {
+                        insertVideoRealm(db.getUrlApp(),db.getNamex(),db.getDesc());
                         Intent intent = YouTubeStandalonePlayer.createVideoIntent(CameraActivity.this, DeveloperKey.DEVELOPER_KEY, db.getUrlApp(),0,isAutoPlayEnabled,false);
                         Bundle extras = new Bundle();
                         extras.putString("YOUTUBE_VIDEO", db.getUrlApp());
@@ -529,6 +538,22 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
     public void openSettings(View view)
     {
         startActivity(new Intent(CameraActivity.this,SettingsActivity.class));
+    }
+
+    private void insertVideoRealm(final String id, final String title,  final String desc)
+    {
+        if(mVideoRealm.where(VideoDatabase.class).equalTo("videoid",id).findFirst()==null)
+        {
+            mVideoRealm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    VideoDatabase db = realm.createObject(VideoDatabase.class);
+                    db.setVideoid(id);
+                    db.setTitles(title);
+                    db.setDesc(desc);
+                }
+            });
+        }
     }
 
 }
