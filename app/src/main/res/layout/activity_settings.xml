@@ -130,6 +130,7 @@
             android:background="#c0c0c0"/>
 
         <RelativeLayout
+            android:onClick="openVideos"
             android:layout_marginTop="20dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">

@@ -17,7 +17,6 @@
 
     <uses-feature android:name="android.hardware.camera" />
 
-
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
@@ -32,7 +31,8 @@
         <activity
             android:name=".activities.SplashActivity"
             android:theme="@style/AppTheme.Launcher">
-            <intent-filter>                <action android:name="android.intent.action.MAIN" />
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
@@ -48,7 +48,8 @@
         <activity
             android:name=".activities.AboutActivity"
             android:theme="@style/AppThemeSecondary" />
-        <activity android:name=".activities.SettingsActivity"></activity>
+        <activity android:name=".activities.SettingsActivity" />
+        <activity android:name=".activities.MyVideoActivity"></activity>
     </application>
 
 </manifest>

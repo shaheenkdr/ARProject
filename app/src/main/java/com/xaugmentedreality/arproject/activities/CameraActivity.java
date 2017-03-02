@@ -6,7 +6,9 @@ import java.util.List;
 
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
@@ -68,6 +70,10 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
     private Button clickButton;
     private ProgressDialog progressDialog;
     private RelativeLayout rlCard;
+    private boolean isAutoPlayEnabled;
+
+    private static final String PREFERENCES_NAME = "videopreferences";
+    private static final String PREFERENCE_ID = "isAutoPlayEnabled";
 
 
 
@@ -134,6 +140,8 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
         descText.setTypeface(typeface1);
         title.setTypeface(typeface2);
 
+
+
         beginAddImages();
     }
 
@@ -173,6 +181,9 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
         progressDialog=ProgressDialog.show(CameraActivity.this, "Loading", "Setting up the engine");
         aRmatcher.start();
         beginAddImages();
+        SharedPreferences pref = getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
+        isAutoPlayEnabled = pref.getBoolean(PREFERENCE_ID,false);
+
     }
 
     /**Activity lifecycle method */
@@ -428,7 +439,7 @@ public class CameraActivity extends AppCompatActivity implements ARmatcherImageC
                 {
                     if(db.getIsVideo())
                     {
-                        Intent intent = YouTubeStandalonePlayer.createVideoIntent(CameraActivity.this, DeveloperKey.DEVELOPER_KEY, db.getUrlApp());
+                        Intent intent = YouTubeStandalonePlayer.createVideoIntent(CameraActivity.this, DeveloperKey.DEVELOPER_KEY, db.getUrlApp(),0,isAutoPlayEnabled,false);
                         Bundle extras = new Bundle();
                         extras.putString("YOUTUBE_VIDEO", db.getUrlApp());
                         intent.putExtras(extras);
