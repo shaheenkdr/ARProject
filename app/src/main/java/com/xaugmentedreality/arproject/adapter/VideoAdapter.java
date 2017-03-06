@@ -2,17 +2,23 @@ package com.xaugmentedreality.arproject.adapter;
 
 
 import android.content.Context;
+import android.graphics.Typeface;
+import android.os.Vibrator;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.xaugmentedreality.arproject.EventBus.DeleteEvent;
 import com.xaugmentedreality.arproject.R;
 import com.xaugmentedreality.arproject.utility.VideoModel;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.List;
 
@@ -23,21 +29,26 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoHolder>
     private static String RAW_URL = "https://img.youtube.com/vi/XXXXX/0.jpg";
 
 
-    public  class VideoHolder extends RecyclerView.ViewHolder implements View.OnClickListener
+    public  class VideoHolder extends RecyclerView.ViewHolder implements View.OnClickListener,View.OnLongClickListener
     {
 
         ImageView thumbnail;
-        TextView title;
         TextView description;
         Context mContext;
+        Vibrator v;
+        RelativeLayout rl;
         VideoHolder(View itemView) {
             super(itemView);
 
             mContext = itemView.getContext();
+            v = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
             thumbnail = (ImageView)itemView.findViewById(R.id.videoPoster);
-            title = (TextView)itemView.findViewById(R.id.titleText);
+            rl = (RelativeLayout)itemView.findViewById(R.id.relativeVideo);
+            Typeface typeface1 = Typeface.createFromAsset(mContext.getAssets(), "fonts/robotomedium.ttf");
             description = (TextView)itemView.findViewById(R.id.descText);
+            description.setTypeface(typeface1);
             itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
 
         }
 
@@ -47,6 +58,15 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoHolder>
         {
 
             //itemView.getContext().startActivity(intent);
+        }
+
+        @Override
+        public boolean onLongClick(View view)
+        {
+            rl.setSelected(true);
+            v.vibrate(200);
+            EventBus.getDefault().post(new DeleteEvent(getLayoutPosition(),d1.vidList.get(getLayoutPosition()).getVideoid()));
+            return true;
         }
 
 
@@ -83,6 +103,20 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoHolder>
         Glide.with(movieViewHolder.mContext)
                 .load(URL)
                 .into(movieViewHolder.thumbnail);
+
+        if(d1.vidList.get(i).getDesc().length()<40)
+        {
+            movieViewHolder.description.setText(d1.vidList.get(i).getDesc());
+        }
+        else
+        {
+            String temp = d1.vidList.get(i).getDesc().substring(0,37)+"...";
+            movieViewHolder.description.setText(temp);
+        }
+
+
+
+
     }
 
     @Override

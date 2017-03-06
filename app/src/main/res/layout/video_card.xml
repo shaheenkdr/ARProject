@@ -1,31 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_centerInParent="true"
     card_view:cardUseCompatPadding="true"
-    android:translationZ="2dp"
     android:id="@+id/cv_fav">
 
     <RelativeLayout
+        android:background="@drawable/selector_row"
+        android:id="@+id/relativeVideo"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+
         <ImageView
+            android:layout_alignParentTop="true"
             android:id="@+id/videoPoster"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
-        <TextView
-            android:layout_below="@+id/videoPoster"
-            android:id="@+id/titleText"
+        <ImageView
+            android:src="@drawable/ic_play_circle_outline_black_24dp"
+            android:layout_centerInParent="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
+
         <TextView
-            android:layout_below="@+id/titleText"
+            android:layout_below="@+id/videoPoster"
             android:id="@+id/descText"
+            android:textSize="18sp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="5dp"
+            android:textColor="#000000"
+            android:alpha="0.6"
+            android:layout_marginBottom="5dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 

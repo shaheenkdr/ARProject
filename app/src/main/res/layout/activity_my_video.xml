@@ -4,11 +4,15 @@
     android:id="@+id/activity_my_video"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:paddingStart="7dp"
+    android:paddingEnd="7dp"
     android:background="#F0F0F0"
     tools:context="com.xaugmentedreality.arproject.activities.MyVideoActivity">
 
     <android.support.v7.widget.RecyclerView
+        android:layout_marginTop="10dp"
         android:id="@+id/videoRecyclerView"
+        android:layout_centerInParent="true"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
