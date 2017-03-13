@@ -3,6 +3,7 @@ package com.xaugmentedreality.arproject.activities;
 import android.media.Image;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.AppCompatImageButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -33,7 +34,7 @@ public class MyVideoActivity extends AppCompatActivity {
 
     private static int remove_index;
     private static StringBuilder strVideoId;
-    private ImageButton deleteButton;
+    private AppCompatImageButton deleteButton;
     private Realm mVideoRealm;
     private TextView titleBar;
     private ImageButton clearButton;
@@ -77,7 +78,7 @@ public class MyVideoActivity extends AppCompatActivity {
         mAdapter.notifyDataSetChanged();
         titleBar = (TextView)findViewById(R.id.titleBar);
 
-        deleteButton = (ImageButton)findViewById(R.id.deleteButton);
+        deleteButton = (AppCompatImageButton) getSupportActionBar().getCustomView().findViewById(R.id.deleteButton);
         deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v)
@@ -96,7 +97,7 @@ public class MyVideoActivity extends AppCompatActivity {
             }
         });
 
-        clearButton = (ImageButton)findViewById(R.id.clearButton);
+  /*      clearButton = (ImageButton)findViewById(R.id.clearButton);
         clearButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -105,7 +106,7 @@ public class MyVideoActivity extends AppCompatActivity {
                 titleBar.setVisibility(View.VISIBLE);
 
             }
-        });
+        });*/
 
     }
 
@@ -135,8 +136,9 @@ public class MyVideoActivity extends AppCompatActivity {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(DeleteEvent event)
     {
+        Log.e("Test","EventBus invoked");
         titleBar.setVisibility(View.INVISIBLE);
-        clearButton.setVisibility(View.VISIBLE);
+        //clearButton.setVisibility(View.VISIBLE);
         deleteButton.setVisibility(View.VISIBLE);
         remove_index = event.getId();
         strVideoId.setLength(0);
