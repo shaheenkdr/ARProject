@@ -1,18 +1,24 @@
 package com.xaugmentedreality.arproject.activities;
 
+import android.content.Context;
+import android.graphics.Typeface;
 import android.media.Image;
+import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.AppCompatImageButton;
+import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.xaugmentedreality.arproject.EventBus.DeleteEvent;
+import com.xaugmentedreality.arproject.EventBus.ResetClickEvent;
 import com.xaugmentedreality.arproject.R;
 import com.xaugmentedreality.arproject.adapter.VideoAdapter;
 import com.xaugmentedreality.arproject.realm.ARDatabase;
@@ -38,6 +44,11 @@ public class MyVideoActivity extends AppCompatActivity {
     private Realm mVideoRealm;
     private TextView titleBar;
     private ImageButton clearButton;
+    private static boolean isLongPressed = false;
+    private Vibrator v;
+    private AppCompatImageView noVideoImage;
+    private TextView noVideoText;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -58,6 +69,15 @@ public class MyVideoActivity extends AppCompatActivity {
         remove_index = -1;
         strVideoId = new StringBuilder("X");
 
+        noVideoImage = (AppCompatImageView)findViewById(R.id.noImage);
+        noVideoText = (TextView)findViewById(R.id.noImageText);
+        Typeface typeface1 = Typeface.createFromAsset(getAssets(), "fonts/robotothin.ttf");
+        noVideoText.setTypeface(typeface1);
+
+        noVideoImage.setVisibility(View.INVISIBLE);
+        noVideoText.setVisibility(View.INVISIBLE);
+
+
         final List<VideoModel> videoList = new ArrayList<>();
 
         RealmResults<VideoDatabase> results = mVideoRealm.where(VideoDatabase.class).findAll();
@@ -76,6 +96,16 @@ public class MyVideoActivity extends AppCompatActivity {
 
         rView.setAdapter(mAdapter);
         mAdapter.notifyDataSetChanged();
+
+        if(videoList.size()<=0)
+        {
+            noVideoImage.setVisibility(View.VISIBLE);
+            noVideoText.setVisibility(View.VISIBLE);
+        }
+
+        v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+
+
         titleBar = (TextView)findViewById(R.id.titleBar);
 
         deleteButton = (AppCompatImageButton) getSupportActionBar().getCustomView().findViewById(R.id.deleteButton);
@@ -87,12 +117,19 @@ public class MyVideoActivity extends AppCompatActivity {
                 {
                     videoList.remove(remove_index);
                     mAdapter.notifyDataSetChanged();
+                    isLongPressed = false;
                     if(!strVideoId.toString().equals("X"))
                     {
                         deleteFromRealm(strVideoId.toString());
                     }
+                    if(videoList.size()<=0)
+                    {
+                        noVideoImage.setVisibility(View.VISIBLE);
+                        noVideoText.setVisibility(View.VISIBLE);
+                    }
                 }
 
+                titleBar.setVisibility(View.VISIBLE);
                 deleteButton.setVisibility(View.INVISIBLE);
             }
         });
@@ -107,6 +144,18 @@ public class MyVideoActivity extends AppCompatActivity {
 
             }
         });*/
+
+        RelativeLayout mainLayout = (RelativeLayout)findViewById(R.id.activity_my_video);
+        mainLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+                if(isLongPressed)
+                {
+                    resetLongClick();
+                }
+            }
+        });
 
     }
 
@@ -126,7 +175,7 @@ public class MyVideoActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                this.finish();
+                handleBackClick();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -136,6 +185,7 @@ public class MyVideoActivity extends AppCompatActivity {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(DeleteEvent event)
     {
+        isLongPressed = true;
         Log.e("Test","EventBus invoked");
         titleBar.setVisibility(View.INVISIBLE);
         //clearButton.setVisibility(View.VISIBLE);
@@ -154,5 +204,29 @@ public class MyVideoActivity extends AppCompatActivity {
                 rows.clear();
             }
         });
+    }
+
+    private void resetLongClick()
+    {
+        v.vibrate(100);
+        titleBar.setVisibility(View.VISIBLE);
+        deleteButton.setVisibility(View.INVISIBLE);
+        isLongPressed = false;
+        EventBus.getDefault().post(new ResetClickEvent(true));
+
+
+    }
+
+    private void handleBackClick()
+    {
+        if(isLongPressed)
+        {
+            resetLongClick();
+        }
+        else
+        {
+            finish();
+        }
+
     }
 }
